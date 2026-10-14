@@ -1,0 +1,910 @@
+<title>DegreeCheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: tool-first hero (pitch left, check form right) → verdict card → browse grid with filter rail, after a clean white consumer-utility look. */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --sunken: #f4f6fa;
+  --line: #e2e7f0;
+  --ink: #131a2b;
+  --muted: #5a6479;
+  --accent: #0b57d0;
+  --accent-ink: #ffffff;
+  --accent-soft: #eaf1fe;
+  --ok: #137a42;   --ok-soft: #e5f5ec;
+  --warn: #965800; --warn-soft: #fff3d9;
+  --bad: #c22a2a;  --bad-soft: #fde8e8;
+  --na: #5a6479;   --na-soft: #eef1f6;
+  --shadow: 0 1px 2px rgba(19, 26, 43, .05), 0 10px 28px rgba(19, 26, 43, .07);
+  --font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1220; --surface: #151b2b; --sunken: #0a0e19; --line: #263049;
+    --ink: #e8ecf5; --muted: #9ba5bb; --accent: #6b9bff; --accent-ink: #0a1022; --accent-soft: #1a2a4f;
+    --ok: #4fc887; --ok-soft: #10301e; --warn: #f1b453; --warn-soft: #33260c;
+    --bad: #ff8080; --bad-soft: #3a1618; --na: #9ba5bb; --na-soft: #1d2437;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 10px 28px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1220; --surface: #151b2b; --sunken: #0a0e19; --line: #263049;
+  --ink: #e8ecf5; --muted: #9ba5bb; --accent: #6b9bff; --accent-ink: #0a1022; --accent-soft: #1a2a4f;
+  --ok: #4fc887; --ok-soft: #10301e; --warn: #f1b453; --warn-soft: #33260c;
+  --bad: #ff8080; --bad-soft: #3a1618; --na: #9ba5bb; --na-soft: #1d2437;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 10px 28px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.2; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+.mono { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; }
+.brand svg { flex: none; }
+.top-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.top-meta a { font-weight: 500; text-decoration: none; padding: 7px 12px; border-radius: 8px; background: var(--accent-soft); white-space: nowrap; }
+
+/* Hero */
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 48px; align-items: start; padding-block: 48px 40px; }
+.pitch { display: grid; gap: 18px; padding-top: 18px; }
+.pitch h1 { font-size: clamp(30px, 4.2vw, 46px); font-weight: 700; letter-spacing: -.02em; }
+.pitch h1 em { font-style: normal; color: var(--accent); }
+.pitch .lede { color: var(--muted); font-size: 16.5px; max-width: 34em; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 6px; }
+.fact b { display: block; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fact span { font-size: 13px; color: var(--muted); }
+.how { display: grid; gap: 10px; margin-top: 8px; padding: 16px 18px; border-radius: var(--radius); background: var(--sunken); font-size: 14px; color: var(--muted); }
+.how strong { color: var(--ink); font-weight: 600; }
+
+/* Check form */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.check { padding: 26px; display: grid; gap: 18px; }
+.check h2 { font-size: 20px; font-weight: 600; }
+.field { display: grid; gap: 6px; position: relative; }
+.field > label, .legend { font-size: 13px; font-weight: 600; }
+.hint { font-size: 12.5px; color: var(--muted); }
+.control { width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 15px; }
+.control:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+select.control { appearance: none; padding-right: 36px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 19px) 20px, calc(100% - 14px) 20px; background-size: 5px 5px; background-repeat: no-repeat; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.chosen { font-size: 12.5px; color: var(--muted); }
+.chosen b { color: var(--ok); font-weight: 600; }
+
+.combo-list { position: absolute; top: 74px; left: 0; right: 0; z-index: 10; margin: 0; padding: 6px; list-style: none; max-height: 300px; overflow: auto; }
+.combo-list li { padding: 9px 10px; border-radius: 8px; cursor: pointer; display: grid; gap: 1px; }
+.combo-list li[aria-selected="true"], .combo-list li:hover { background: var(--accent-soft); }
+.combo-list .n { font-weight: 500; font-size: 14.5px; }
+.combo-list .m { font-size: 12px; color: var(--muted); }
+.combo-list .empty { color: var(--muted); font-size: 13.5px; cursor: default; }
+
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { display: grid; place-items: center; height: 38px; border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--muted); text-align: center; }
+.seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.seg input:focus-visible + label { outline: 2px solid var(--accent); }
+
+.linkish { background: none; border: 0; padding: 0; color: var(--accent); font-size: 12.5px; font-weight: 500; cursor: pointer; text-align: left; }
+.passing { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 12px; border-radius: 10px; background: var(--sunken); font-size: 13px; }
+.passing select { height: 36px; width: auto; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 15.5px; cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn.ghost { background: var(--accent-soft); color: var(--accent); height: 40px; font-size: 14px; padding: 0 16px; }
+.tries { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.tries button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 11px; font-size: 12.5px; cursor: pointer; color: var(--ink); }
+.tries button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Result */
+.result-sec .wrap { padding-block: 8px 56px; }
+.result { overflow: hidden; }
+.verdict { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; padding: 26px 28px; background: var(--tone-soft); border-bottom: 1px solid var(--line); }
+.verdict .ico { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--tone); color: var(--surface); }
+.verdict .pill { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tone); margin-bottom: 4px; }
+.verdict h2 { font-size: clamp(20px, 2.4vw, 25px); font-weight: 600; }
+.verdict p { margin-top: 8px; color: var(--muted); max-width: 62em; }
+.example-tag { margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: .04em; vertical-align: 2px; }
+.tone-ok { --tone: var(--ok); --tone-soft: var(--ok-soft); }
+.tone-warn { --tone: var(--warn); --tone-soft: var(--warn-soft); }
+.tone-bad { --tone: var(--bad); --tone-soft: var(--bad-soft); }
+.tone-na { --tone: var(--na); --tone-soft: var(--na-soft); }
+
+.rbody { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.rbody > section { padding: 22px 28px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.rbody > section + section { border-left: 1px solid var(--line); }
+.rbody h3 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; margin: 0; }
+.summary dt { font-size: 12px; color: var(--muted); }
+.summary dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+
+.tl-scroll { overflow-x: auto; }
+.tl { display: grid; grid-template-columns: 74px repeat(var(--n), minmax(52px, 1fr)); gap: 6px; min-width: 460px; align-items: center; }
+.tl .yr { font-size: 11.5px; text-align: center; color: var(--muted); padding: 4px 0; border-radius: 6px; }
+.tl .yr.q { background: var(--ink); color: var(--bg); font-weight: 500; }
+.tl .lab { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.tl .cell { height: 30px; border-radius: 7px; background: var(--sunken); border: 1px dashed var(--line); display: grid; place-items: center; }
+.tl .cell.on { background: var(--accent); border: 0; }
+.tl .cell.on.q { background: var(--ok); }
+.tl .cell.q:not(.on) { border: 2px solid var(--bad); background: var(--bad-soft); }
+.tl .cell.nodata { background: repeating-linear-gradient(135deg, var(--sunken) 0 5px, var(--line) 5px 6px); border: 0; }
+.tl .cell svg { color: var(--accent-ink); }
+.legend-row { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
+.legend-row i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+
+.evidence { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.evidence li { padding: 10px 12px; border-radius: 10px; background: var(--sunken); font-size: 13.5px; display: grid; gap: 2px; }
+.evidence .meta { font-size: 12px; color: var(--muted); }
+.next { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--line); display: grid; gap: 6px; font-size: 14px; }
+.next b { font-weight: 600; }
+.cands { display: flex; flex-wrap: wrap; gap: 8px; }
+.cands button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 12px; cursor: pointer; text-align: left; font-size: 13.5px; }
+.cands button:hover { border-color: var(--accent); }
+.cands small { display: block; color: var(--muted); font-size: 12px; }
+.ractions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.fineprint { font-size: 12.5px; color: var(--muted); }
+.copied { font-size: 13px; color: var(--ok); font-weight: 500; }
+
+/* Browse */
+.browse { background: var(--sunken); border-top: 1px solid var(--line); }
+.browse .wrap { padding-block: 52px 64px; display: grid; gap: 22px; }
+.browse-head { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.browse-head h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; }
+.browse-head p { color: var(--muted); }
+.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.tabs button { height: 42px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-weight: 500; cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.browse-grid { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+.filters { padding: 18px; display: grid; gap: 18px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); }
+.filters h3 { font-size: 15px; font-weight: 600; }
+.checks { display: grid; gap: 8px; font-size: 13.5px; }
+.checks label { display: flex; gap: 9px; align-items: center; cursor: pointer; }
+.checks input { width: 16px; height: 16px; accent-color: var(--accent); }
+.results { display: grid; gap: 14px; min-width: 0; }
+.search { position: relative; }
+.search svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.search input { width: 100%; height: 52px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); padding: 0 20px 0 48px; font-size: 15px; box-shadow: var(--shadow); }
+.search input:focus { outline: none; border-color: var(--accent); }
+.count { font-size: 13px; color: var(--ok); font-weight: 500; }
+.unis { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.uni { padding: 18px; display: grid; gap: 12px; align-content: start; }
+.uni-top { display: flex; gap: 12px; align-items: flex-start; }
+.mono-tile { flex: none; width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; font-weight: 600; font-size: 15px; background: var(--accent-soft); color: var(--accent); }
+.uni h3 { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.chip { display: inline-block; margin-top: 5px; font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: var(--sunken); color: var(--muted); }
+.uni dl { margin: 0; display: grid; gap: 7px; font-size: 13px; }
+.uni dl div { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); padding-top: 7px; }
+.uni dt { color: var(--muted); }
+.uni dd { margin: 0; font-weight: 500; text-align: right; }
+.modes { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.mode-b { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; }
+.mode-b.on { background: var(--ok-soft); color: var(--ok); }
+.mode-b.odl { background: var(--accent-soft); color: var(--accent); }
+.uni .more { justify-self: end; background: none; border: 0; color: var(--accent); font-weight: 500; cursor: pointer; font-size: 14px; padding: 2px 0; }
+.show-more { justify-self: center; }
+
+/* Modal */
+dialog { border: 0; padding: 0; border-radius: 18px; width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); background: var(--surface); color: var(--ink); box-shadow: 0 30px 80px rgba(0, 0, 0, .3); }
+dialog::backdrop { background: rgba(10, 14, 25, .55); }
+.m-head { position: sticky; top: 0; z-index: 2; background: var(--surface); padding: 22px 24px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; }
+.m-title { display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; }
+.m-title h2 { font-size: 20px; font-weight: 600; }
+.m-title p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--sunken); cursor: pointer; display: grid; place-items: center; }
+.m-head input { height: 40px; border-radius: 10px; }
+.m-body { padding: 8px 24px 24px; display: grid; gap: 18px; }
+.m-group h3 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 12px 0 6px; }
+.prog { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.prog .pn { font-size: 13.5px; font-weight: 500; overflow-wrap: anywhere; }
+.dots { display: flex; gap: 4px; }
+.dot { width: 18px; height: 18px; border-radius: 5px; background: var(--sunken); border: 1px solid var(--line); font-size: 9px; font-weight: 600; display: grid; place-items: center; color: var(--accent-ink); }
+.dot.o { background: var(--ok); border: 0; }
+.dot.d { background: var(--accent); border: 0; }
+.dot.b { background: linear-gradient(135deg, var(--accent) 50%, var(--ok) 50%); border: 0; }
+.prog button { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 5px 10px; font-size: 12.5px; cursor: pointer; color: var(--accent); font-weight: 500; }
+.dots-key { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); align-items: center; }
+.dots-key .dot { display: inline-grid; width: 13px; height: 13px; vertical-align: -2px; margin-right: 4px; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 24px 32px; font-size: 12.5px; color: var(--muted); display: grid; gap: 6px; }
+
+@media (max-width: 920px) {
+  .hero .wrap { grid-template-columns: 1fr; gap: 28px; padding-block: 28px; }
+  .pitch { padding-top: 0; }
+  .rbody { grid-template-columns: 1fr; }
+  .rbody > section + section { border-left: 0; border-top: 1px solid var(--line); }
+  .browse-grid { grid-template-columns: 1fr; }
+  .filters { position: static; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; }
+  .top-meta span { display: none; }
+  .check { padding: 20px; }
+  .row2, .filters { grid-template-columns: 1fr; }
+  .verdict { padding: 20px; grid-template-columns: 1fr; gap: 12px; }
+  .rbody > section { padding: 18px 20px; }
+  .summary { grid-template-columns: 1fr; }
+  .prog { grid-template-columns: minmax(0, 1fr) auto; }
+  .prog .dots { grid-column: 1 / -1; }
+  .how { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .result.flash { animation: rise .35s ease-out; }
+  @keyframes rise { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#check" aria-label="DegreeCheck home">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.4 12 15 6.9-1.6 12-7.5 12-15V7L16 2Z" fill="var(--accent)"/><path d="m10.5 16.2 3.8 3.8 7.4-7.6" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      DegreeCheck
+    </a>
+    <div class="top-meta">
+      <span id="asof">UGC-DEB data</span>
+      <a href="https://deb.ugc.ac.in/Home/HEI_Prog_List" target="_blank" rel="noopener">UGC source list ↗</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="check">
+    <div class="wrap">
+      <div class="pitch">
+        <p class="eyebrow">UGC-DEB approval check</p>
+        <h1>Was this <em>online or distance degree</em> approved by UGC?</h1>
+        <p class="lede">Enter the university, programme, mode and admission year. We match it against every programme UGC's Distance Education Bureau has approved since 2020-21 and show you the evidence.</p>
+        <div class="facts" id="facts"></div>
+        <div class="how">
+          <p><strong>Why admission year matters:</strong> UGC approves programmes one academic year at a time. A degree is valid if the programme was approved for the year the student enrolled, even if it lost approval later.</p>
+          <p><strong>Why mode matters:</strong> Online and Distance (ODL) are separate approvals. A university approved for one is not automatically approved for the other.</p>
+        </div>
+      </div>
+
+      <form class="card check" id="form" novalidate autocomplete="off">
+        <h2>Check a degree</h2>
+
+        <div class="field">
+          <label for="uni">University</label>
+          <input class="control" id="uni" role="combobox" aria-expanded="false" aria-controls="uni-list" aria-autocomplete="list" placeholder="Start typing, e.g. Lovely Professional" spellcheck="false">
+          <ul class="combo-list card" id="uni-list" role="listbox" hidden></ul>
+          <p class="chosen" id="uni-chosen">Pick from the list. A name that isn't listed has no UGC-DEB approved programmes.</p>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="degree">Degree</label>
+            <select class="control" id="degree"></select>
+          </div>
+          <div class="field">
+            <label for="spec">Specialisation</label>
+            <select class="control" id="spec"></select>
+          </div>
+        </div>
+        <div class="field" id="spec-other-wrap" hidden>
+          <label for="spec-other">Specialisation as printed on the certificate</label>
+          <input class="control" id="spec-other" placeholder="e.g. Finance">
+        </div>
+
+        <div class="field">
+          <span class="legend" id="mode-legend">Mode of study</span>
+          <div class="seg" role="radiogroup" aria-labelledby="mode-legend">
+            <input type="radio" name="mode" id="mode-on" value="ONLINE"><label for="mode-on">Online</label>
+            <input type="radio" name="mode" id="mode-odl" value="ODL"><label for="mode-odl">Distance (ODL)</label>
+            <input type="radio" name="mode" id="mode-any" value="" checked><label for="mode-any">Not sure</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="year">Year of admission</label>
+          <select class="control" id="year"></select>
+          <p class="hint">The academic year the student enrolled, not the year they passed.</p>
+          <button type="button" class="linkish" id="passing-toggle" aria-expanded="false">Only know the passing year?</button>
+          <div class="passing" id="passing" hidden>
+            <label for="passing-year">Passed in</label>
+            <select class="control" id="passing-year"></select>
+            <span id="passing-note"></span>
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Check approval</button>
+        <div class="tries" id="tries"><span>Try:</span></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="result-sec" aria-live="polite">
+    <div class="wrap"><article class="card result" id="result"></article></div>
+  </section>
+
+  <section class="browse" id="browse">
+    <div class="wrap">
+      <div class="browse-head">
+        <p class="eyebrow">Browse</p>
+        <h2>Universities with UGC-DEB approved programmes</h2>
+        <p>Every institution in the list, with the years and modes it was approved for.</p>
+      </div>
+      <div class="tabs" role="group" aria-label="Filter by mode">
+        <button type="button" data-mode="" aria-pressed="true">All</button>
+        <button type="button" data-mode="ONLINE" aria-pressed="false">Online</button>
+        <button type="button" data-mode="ODL" aria-pressed="false">Distance (ODL)</button>
+      </div>
+      <div class="browse-grid">
+        <aside class="card filters" aria-label="Filters">
+          <div class="field">
+            <label for="f-state"><h3>State</h3></label>
+            <select class="control" id="f-state"><option value="">All states</option></select>
+          </div>
+          <div class="field">
+            <h3>Type</h3>
+            <div class="checks" id="f-types"></div>
+          </div>
+          <div class="field">
+            <label for="f-year"><h3>Approved in</h3></label>
+            <select class="control" id="f-year"><option value="">Any year</option></select>
+          </div>
+        </aside>
+        <div class="results">
+          <div class="search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="b-search" type="search" placeholder="Search a university, e.g. Manipal" aria-label="Search universities">
+          </div>
+          <p class="count" id="b-count"></p>
+          <div class="unis" id="b-grid"></div>
+          <button type="button" class="btn ghost show-more" id="b-more" hidden>Show more universities</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="modal" aria-labelledby="m-name">
+  <div class="m-head">
+    <div class="m-title">
+      <div><h2 id="m-name"></h2><p id="m-sub"></p></div>
+      <button type="button" class="x" id="m-close" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <input class="control" id="m-search" type="search" placeholder="Filter programmes" aria-label="Filter programmes">
+    <div class="dots-key" id="m-key"></div>
+  </div>
+  <div class="m-body" id="m-body"></div>
+</dialog>
+
+<footer>
+  <div class="wrap">
+    <p>DegreeCheck confirms whether a programme was approved by UGC-DEB. It does not confirm that a particular certificate is genuine; use DigiLocker or the university's own verification service for that.</p>
+    <p id="foot-src"></p>
+  </div>
+</footer>
+
+<script type="application/json" id="deb-data">__DEB_DATA__</script>
+<script>
+(() => {
+"use strict";
+const D = JSON.parse(document.getElementById("deb-data").textContent);
+const YEARS = D.years;                       // ["2020-21", ...]
+const PRE_YEARS = ["2018-19", "2019-20"];    // selectable, outside coverage
+const MODE_LABEL = { ODL: "Distance (ODL)", ONLINE: "Online" };
+
+/* ---------- degrees ---------- */
+const DEGREES = {
+  MBA: ["MBA", "Master of Business Administration", 2], BBA: ["BBA", "Bachelor of Business Administration", 3],
+  MCA: ["MCA", "Master of Computer Applications", 2], BCA: ["BCA", "Bachelor of Computer Applications", 3],
+  MCOM: ["M.Com", "Master of Commerce", 2], BCOM: ["B.Com", "Bachelor of Commerce", 3],
+  MA: ["MA", "Master of Arts", 2], BA: ["BA", "Bachelor of Arts", 3],
+  MSC: ["M.Sc", "Master of Science", 2], BSC: ["B.Sc", "Bachelor of Science", 3],
+  MSW: ["MSW", "Master of Social Work", 2], BSW: ["BSW", "Bachelor of Social Work", 3],
+  MED: ["M.Ed", "Master of Education", 2], BED: ["B.Ed", "Bachelor of Education", 2],
+  BEDSPL: ["B.Ed (Special Education)", "Bachelor of Special Education", 2],
+  MLIS: ["MLIS", "Master of Library & Information Science", 1], BLIS: ["BLIS", "Bachelor of Library & Information Science", 1],
+  PGD: ["PG Diploma", "Post Graduate Diploma", 1],
+  MJMC: ["MJMC", "Master of Journalism & Mass Communication", 2], BJMC: ["BJMC", "Bachelor of Journalism & Mass Communication", 3],
+  MFA: ["MFA", "Master of Fine Arts", 2], BFA: ["BFA", "Bachelor of Fine Arts", 4],
+  MPA: ["MPA", "Master of Performing Arts", 2], BPA: ["BPA", "Bachelor of Performing Arts", 3],
+  MMS: ["MMS", "Master of Management Studies", 2], BMS: ["BMS", "Bachelor of Management Studies", 3],
+  BBM: ["BBM", "Bachelor of Business Management", 3],
+  MTTM: ["MTTM", "Master of Tourism & Travel Management", 2], BTTM: ["BTTM", "Bachelor of Tourism & Travel Management", 3],
+  ACHARYA: ["Acharya", "Acharya (Sanskrit, PG)", 2], SHASTRI: ["Shastri", "Shastri (Sanskrit, UG)", 3],
+};
+const NON_ODL = {
+  "X-BTECH": "B.Tech / B.E.", "X-MTECH": "M.Tech / M.E.", "X-MED": "MBBS / BDS / medical",
+  "X-LAW": "LLB / LLM (law)", "X-PHARM": "B.Pharm / M.Pharm", "X-ARCH": "B.Arch (architecture)",
+  "X-NURS": "B.Sc Nursing", "X-PHYSIO": "BPT (physiotherapy)",
+};
+const degName = c => DEGREES[c] ? DEGREES[c][0] : NON_ODL[c];
+
+/* ---------- normalisation (mirrors ugc_deb/normalize.py) ---------- */
+const fold = s => (s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "");
+const squash = s => fold(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+function uniKey(name) {
+  let s = fold(name).replace(/\(.*?\)/g, " ").replace(/\buniv\b\.?/gi, "university");
+  s = squash(s);
+  for (const n of ["deemedtobeuniversity", "deemeduniversity", "deemedtobe"]) s = s.split(n).join("");
+  return s.startsWith("the") ? s.slice(3) : s;
+}
+const uniCore = k => ["university", "vishwavidyalaya", "vishwavidyalay", "vidyapeeth", "vidyapith"].reduce((a, w) => a.split(w).join(""), k);
+function lev(a, b) {
+  const m = a.length, n = b.length; if (!m || !n) return m || n;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[n];
+}
+const sim = (a, b) => (a && b) ? (a.length + b.length - lev(a, b)) / (a.length + b.length) : 0;
+const STOP = new Set(["and", "of", "in", "the", "with", "general", "core", "hons", "honours", "programme", "program",
+  "combination", "subjects", "subject", "from", "ugc", "list", "any", "three", "two"]);
+const specTokens = s => (s || "").toLowerCase().replace(/&/g, " and ").split(/[^a-z0-9]+/).filter(t => t && !/^\d+$/.test(t) && !STOP.has(t));
+function specMatches(q, r) {
+  const qt = specTokens(q), rt = specTokens(r);
+  if (!qt.length) return true;
+  if (!rt.length) return false;
+  return qt.every(t => rt.some(u => t === u || (t.length > 4 && sim(t, u) >= 0.85)));
+}
+
+/* ---------- index ---------- */
+const U = D.unis.map((u, i) => ({ ...u, i, core: uniCore(u.k), rows: [], years: new Set(), modes: new Set() }));
+const P = D.progs; // [name, code, spec]
+for (const [u, p, y, m] of D.rows) {
+  const r = { u, p, y: YEARS[y], mode: m ? "ONLINE" : "ODL", name: P[p][0], code: P[p][1], spec: P[p][2] };
+  U[u].rows.push(r); U[u].years.add(r.y); U[u].modes.add(r.mode);
+}
+const byKey = new Map(U.map(u => [u.k, u]));
+const ALIASES = {
+  ignou: "Indira Gandhi National Open University", lpu: "Lovely Professional University", smu: "Sikkim Manipal University",
+  ycmou: "Yashwantrao Chavan Maharashtra Open University", ksou: "Karnataka State Open University", tnou: "Tamil Nadu Open University",
+  uou: "Uttarakhand Open University", nou: "Nalanda Open University", baou: "Dr. Babasaheb Ambedkar Open University",
+  vmou: "Vardhman Mahaveer Open University", mpbou: "M.P. Bhoj (Open) University", nsou: "Netaji Subhas Open University",
+  kluniversity: "Koneru Lakshmaiah Education Foundation", sndt: "Smt. Nathibai Damodar Thackersey Women's University",
+  dei: "Dayal Bagh Educational Institute", gla: "G.L.A. University",
+};
+const acr = new Map();
+for (const [a, full] of Object.entries(ALIASES)) { const u = byKey.get(uniKey(full)); if (u) acr.set(a, u); }
+for (const u of U) for (const a of u.a) if (!acr.has(a)) acr.set(a, u);
+
+function resolveUni(text) {
+  const k = uniKey(text);
+  if (!k) return { u: null, cands: [] };
+  if (byKey.has(k)) return { u: byKey.get(k), cands: [] };
+  if (acr.has(squash(text))) return { u: acr.get(squash(text)), cands: [] };
+  const qc = uniCore(k), scored = [];
+  for (const u of U) {
+    let sc = qc && qc === u.core ? 1 : sim(qc, u.core);
+    if (qc.length >= 4 && u.core && (u.core.includes(qc) || qc.includes(u.core))) sc = Math.max(sc, 0.85);
+    if (sc >= 0.8) scored.push([sc, u]);
+  }
+  scored.sort((a, b) => b[0] - a[0]);
+  const cands = scored.slice(0, 5).map(s => s[1]);
+  if (scored.length && scored[0][0] >= 0.9 && (scored.length === 1 || scored[0][0] - scored[1][0] >= 0.05)) return { u: scored[0][1], cands: [] };
+  return { u: null, cands };
+}
+
+/* ---------- the check (mirrors ugc_deb/verify.py) ---------- */
+function check(q) {
+  const out = { q, tone: "na", records: [], history: null };
+  const fail = (verdict, reason, headline, detail, next, extra = {}) => Object.assign(out, { verdict, reason, headline, detail, next }, extra);
+
+  if (NON_ODL[q.code]) {
+    return fail("NOT_APPROVED", "NOT_OFFERED_VIA_ODL_ONLINE", `${NON_ODL[q.code]} can't be earned through online or distance study`,
+      "Professional degrees like engineering, medicine, law, pharmacy, nursing and architecture are outside the UGC-DEB scheme. UGC regulations generally don't permit them in Online or ODL mode, so no university is approved for them.",
+      "A certificate showing this degree earned online or by distance should be treated as invalid unless the issuing body shows written approval from the relevant regulator (AICTE, NMC, BCI, PCI, INC or COA).",
+      { tone: "bad" });
+  }
+  let u = q.uni;
+  if (!u) {
+    const r = resolveUni(q.uniText);
+    if (r.u) { u = r.u; out.autoMatched = true; }
+    else if (r.cands.length) return fail("UNIVERSITY_AMBIGUOUS", "CONFIRM_UNIVERSITY", "Which university did you mean?",
+      `"${q.uniText}" isn't an exact match for any institution in the UGC-DEB list. Pick the right one below and we'll run the check.`, null, { tone: "na", cands: r.cands });
+    else return fail("UNIVERSITY_NOT_FOUND", "NOT_IN_DEB_LIST", "This university isn't in the UGC-DEB list",
+      `No institution called "${q.uniText}" has any UGC-DEB approved online or distance programme between ${YEARS[0]} and ${YEARS.at(-1)}.`,
+      "Check the spelling on the certificate. If the name is right, the degree wasn't earned through a UGC-DEB approved programme. Also check UGC's list of fake universities.",
+      { tone: "bad" });
+  }
+  out.uni = u;
+  if (!YEARS.includes(q.year)) return fail("OUT_OF_COVERAGE", "YEAR_OUTSIDE_DATA", `Our data starts at ${YEARS[0]}`,
+    `UGC's online list covers admissions from ${YEARS[0]} to ${YEARS.at(-1)}. ${q.year} admissions were approved under older DEB notices.`,
+    "Ask the university for its UGC-DEB recognition letter for that year, or check the archived DEB notices on ugc.gov.in.", { tone: "na" });
+
+  const deg = u.rows.filter(r => r.code === q.code);
+  if (!deg.length) return fail("NOT_APPROVED", "PROGRAMME_NEVER_APPROVED", `${u.n} was never approved for ${degName(q.code)}`,
+    `${u.n} appears in the UGC-DEB list, but not for ${DEGREES[q.code][1]} in any year from ${YEARS[0]} to ${YEARS.at(-1)}, in either mode.`,
+    "Check the degree name on the certificate. If it matches, the programme wasn't UGC-DEB approved.", { tone: "bad" });
+
+  const genericQ = specTokens(q.spec).length === 0;
+  const spec = genericQ ? deg : deg.filter(r => specMatches(q.spec, r.spec));
+  const generic = deg.filter(r => specTokens(r.spec).length === 0);
+  const at = (recs, modeOk = true) => recs.filter(r => r.y === q.year && (!q.mode || !modeOk || r.mode === q.mode));
+  out.history = (spec.length ? spec : generic.length ? generic : deg);
+  const prog = `${degName(q.code)}${genericQ ? "" : " (" + titleCase(q.spec) + ")"}`;
+  const modeTxt = q.mode ? ` in ${MODE_LABEL[q.mode]} mode` : "";
+
+  let hit = at(spec);
+  if (hit.length) {
+    const modes = [...new Set(hit.map(r => r.mode))];
+    return fail("APPROVED", "MATCH", `Approved for admissions in ${q.year}`,
+      `UGC-DEB approved ${u.n} to offer ${prog}${q.mode ? modeTxt : " in " + modes.map(m => MODE_LABEL[m]).join(" and ") + " mode"} for students admitted in ${q.year}.`,
+      q.mode ? "Programme approval is confirmed. To confirm the certificate itself is genuine, check DigiLocker or the university's verification service." :
+        `You picked "Not sure" for mode. Check the marksheet says ${modes.map(m => MODE_LABEL[m]).join(" or ")}; that's what was approved.`,
+      { tone: "ok", records: hit });
+  }
+  if (!genericQ && (hit = at(generic)).length) return fail("NEEDS_REVIEW", "BASE_DEGREE_ONLY", `${degName(q.code)} is approved, but ${titleCase(q.spec)} isn't listed separately`,
+    `UGC-DEB approved ${u.n} for ${degName(q.code)}${modeTxt} in ${q.year}, without naming specialisations. This list alone can't confirm ${titleCase(q.spec)}.`,
+    "Ask the university for its UGC-DEB approval letter, which lists the approved specialisations.", { tone: "warn", records: hit });
+
+  const other = at(spec, false).length ? at(spec, false) : (!genericQ ? at(generic, false) : []);
+  if (other.length && q.mode) {
+    const modes = [...new Set(other.map(r => r.mode))];
+    return fail("NOT_APPROVED", "WRONG_MODE", `Approved for ${modes.map(m => MODE_LABEL[m]).join(" and ")}, not ${MODE_LABEL[q.mode]}`,
+      `In ${q.year}, ${u.n} was approved to offer ${prog} only in ${modes.map(m => MODE_LABEL[m]).join(" and ")} mode.`,
+      `Check the mode printed on the marksheet or certificate. If it says ${MODE_LABEL[q.mode]}, that mode wasn't approved for that year.`,
+      { tone: "bad", records: other });
+  }
+  if (!u.years.has(q.year)) return fail("NEEDS_REVIEW", "UNIVERSITY_NOT_LISTED_FOR_YEAR", `UGC's list has no entries for ${u.n} in ${q.year}`,
+    `The UGC-DEB list skips some universities for whole years. ${u.n} is listed for ${[...u.years].sort().join(", ")}, but not ${q.year}, so we can't confirm or rule out approval.`,
+    "Ask the university for its UGC-DEB approval letter for the admission year. The timeline shows the years it was approved.", { tone: "warn" });
+  if (spec.length) return fail("NOT_APPROVED", "YEAR_NOT_APPROVED", `Not approved for admissions in ${q.year}`,
+    `${u.n} was approved for ${prog}${modeTxt} in other years, but not for students admitted in ${q.year}.`,
+    "Double-check the admission year on the student's ID card or admission letter. Approval follows the year of admission, not the year of passing.",
+    { tone: "bad" });
+  const listed = [...new Set((at(deg).length ? at(deg) : deg).map(r => r.spec).filter(Boolean))].slice(0, 12);
+  return fail("NOT_APPROVED", "SPECIALISATION_NOT_APPROVED", `${titleCase(q.spec)} isn't an approved ${degName(q.code)} specialisation here`,
+    `${u.n} is approved for ${degName(q.code)}, but ${titleCase(q.spec)} isn't among its listed specialisations${listed.length ? ": " + listed.map(titleCase).join("; ") : ""}.`,
+    "Check the specialisation printed on the certificate against the list above.", { tone: "bad", records: [] });
+}
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const SMALL = new Set(["and", "of", "in", "the", "for", "to", "with", "&"]);
+function titleCase(s) {
+  return String(s || "").toLowerCase().replace(/\s+/g, " ").trim().split(" ")
+    .map((w, i) => (i && SMALL.has(w)) ? w : (/^(hr|it|mba|bba|ma|bca|mca|ii|iii)$/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
+}
+const initials = n => n.replace(/\(.*?\)/g, "").split(/\s+/).filter(w => /^[A-Za-z]/.test(w) && !SMALL.has(w.toLowerCase())).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+const fmtDate = iso => { try { return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return iso; } };
+const progCount = u => new Set(u.rows.map(r => r.p)).size;
+
+/* ---------- header facts ---------- */
+$("#asof").textContent = `UGC-DEB data as of ${fmtDate(D.asOf)}`;
+$("#foot-src").innerHTML = `Source: <a href="${esc(D.source)}" target="_blank" rel="noopener">UGC-DEB ODL and Online Programmes list</a>, fetched ${esc(fmtDate(D.asOf))}. ${D.rows.length.toLocaleString("en-IN")} approvals, ${YEARS[0]} to ${YEARS.at(-1)}.`;
+$("#facts").innerHTML = [
+  [D.rows.length.toLocaleString("en-IN"), "programme approvals"],
+  [U.length, "universities"],
+  [`${YEARS[0].slice(0, 4)}–${YEARS.at(-1).slice(2)}`, "admission years covered"],
+].map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("");
+
+/* ---------- form ---------- */
+const F = { uni: null };
+const uniIn = $("#uni"), list = $("#uni-list"), degSel = $("#degree"), specSel = $("#spec"), yearSel = $("#year");
+let active = -1, matches = [];
+
+function searchUnis(t) {
+  const q = squash(t); if (!q) return [];
+  const words = fold(t).toLowerCase().split(/\s+/).filter(Boolean);
+  return U.map(u => {
+    const n = u.n.toLowerCase();
+    let s = 0;
+    if (u.a.includes(q) || [...acr.entries()].some(([a, v]) => a === q && v === u)) s = 3;
+    else if (squash(u.n).startsWith(q)) s = 2;
+    else if (words.every(w => n.includes(w)) || u.k.includes(q)) s = 1;
+    return [s, u];
+  }).filter(x => x[0]).sort((a, b) => b[0] - a[0] || a[1].n.localeCompare(b[1].n)).slice(0, 8).map(x => x[1]);
+}
+function renderList() {
+  matches = searchUnis(uniIn.value);
+  if (!uniIn.value.trim()) { closeList(); return; }
+  list.innerHTML = matches.length ? matches.map((u, i) =>
+    `<li role="option" id="opt-${i}" data-i="${u.i}" aria-selected="${i === active}"><span class="n">${esc(u.n)}</span><span class="m">${esc([u.s, u.t].filter(Boolean).join(" · "))} · ${[...u.modes].map(m => MODE_LABEL[m]).join(", ")}</span></li>`).join("")
+    : `<li class="empty" role="option" aria-disabled="true">No match in the UGC-DEB list. You can still check it.</li>`;
+  list.hidden = false; uniIn.setAttribute("aria-expanded", "true");
+  uniIn.setAttribute("aria-activedescendant", active >= 0 ? `opt-${active}` : "");
+}
+function closeList() { list.hidden = true; active = -1; uniIn.setAttribute("aria-expanded", "false"); }
+function pickUni(u) {
+  F.uni = u; uniIn.value = u ? u.n : uniIn.value; closeList();
+  $("#uni-chosen").innerHTML = u ? `<b>✓ In UGC-DEB list</b> · ${esc(u.s || "State not given")} · listed ${[...u.years].sort()[0]} to ${[...u.years].sort().at(-1)}`
+    : "Pick from the list. A name that isn't listed has no UGC-DEB approved programmes.";
+  fillDegrees();
+}
+uniIn.addEventListener("input", () => { F.uni = null; active = -1; renderList(); $("#uni-chosen").textContent = "Pick from the list. A name that isn't listed has no UGC-DEB approved programmes."; fillDegrees(); });
+uniIn.addEventListener("focus", () => { if (uniIn.value && !F.uni) renderList(); });
+uniIn.addEventListener("keydown", e => {
+  if (list.hidden && e.key === "ArrowDown") { renderList(); return; }
+  if (e.key === "ArrowDown") { active = Math.min(active + 1, matches.length - 1); renderList(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { active = Math.max(active - 1, 0); renderList(); e.preventDefault(); }
+  else if (e.key === "Enter" && !list.hidden && active >= 0) { pickUni(matches[active]); e.preventDefault(); }
+  else if (e.key === "Escape") closeList();
+});
+list.addEventListener("mousedown", e => { const li = e.target.closest("li[data-i]"); if (li) { e.preventDefault(); pickUni(U[+li.dataset.i]); } });
+document.addEventListener("click", e => { if (!e.target.closest(".field")) closeList(); });
+
+function fillDegrees(keep) {
+  const prev = keep || degSel.value;
+  const have = F.uni ? new Set(F.uni.rows.map(r => r.code)) : null;
+  const opt = c => `<option value="${c}">${esc(DEGREES[c][0])}${DEGREES[c][0] !== DEGREES[c][1] ? " · " + esc(DEGREES[c][1]) : ""}</option>`;
+  const codes = Object.keys(DEGREES);
+  let html = `<option value="">Select degree</option>`;
+  if (have) {
+    html += `<optgroup label="Approved at this university">${codes.filter(c => have.has(c)).map(opt).join("")}</optgroup>`;
+    html += `<optgroup label="Never approved here">${codes.filter(c => !have.has(c)).map(opt).join("")}</optgroup>`;
+  } else html += `<optgroup label="Degrees">${codes.map(opt).join("")}</optgroup>`;
+  html += `<optgroup label="Professional degrees">${Object.entries(NON_ODL).map(([c, n]) => `<option value="${c}">${esc(n)}</option>`).join("")}</optgroup>`;
+  degSel.innerHTML = html;
+  if ([...degSel.options].some(o => o.value === prev)) degSel.value = prev;
+  fillSpecs();
+}
+function fillSpecs(keep) {
+  const code = degSel.value, prev = keep ?? specSel.value;
+  let specs = [];
+  if (F.uni && DEGREES[code]) {
+    const seen = new Map();
+    for (const r of F.uni.rows) if (r.code === code && specTokens(r.spec).length) {
+      const label = titleCase(r.spec);
+      if (!seen.has(label.toLowerCase())) seen.set(label.toLowerCase(), [label, r.spec]);
+    }
+    specs = [...seen.values()].sort((a, b) => a[0].localeCompare(b[0]));
+  }
+  specSel.innerHTML = `<option value="">None / General</option>` +
+    specs.map(([l, v]) => `<option value="${esc(v)}">${esc(l.length > 60 ? l.slice(0, 58) + "…" : l)}</option>`).join("") +
+    `<option value="__other">Other (type it)</option>`;
+  specSel.disabled = !!NON_ODL[code];
+  if ([...specSel.options].some(o => o.value === prev)) specSel.value = prev;
+  $("#spec-other-wrap").hidden = specSel.value !== "__other";
+  updatePassingNote();
+}
+degSel.addEventListener("change", () => fillSpecs(""));
+specSel.addEventListener("change", () => { $("#spec-other-wrap").hidden = specSel.value !== "__other"; if (specSel.value === "__other") $("#spec-other").focus(); });
+
+yearSel.innerHTML = [...YEARS].reverse().map(y => `<option value="${y}">${y}</option>`).join("") +
+  `<optgroup label="Before UGC's online list">${[...PRE_YEARS].reverse().map(y => `<option value="${y}">${y}</option>`).join("")}</optgroup>`;
+const nowYear = +YEARS.at(-1).slice(0, 4) + 1;
+$("#passing-year").innerHTML = Array.from({ length: 12 }, (_, i) => nowYear + 2 - i).map(y => `<option>${y}</option>`).join("");
+$("#passing-toggle").addEventListener("click", e => {
+  const open = $("#passing").hidden; $("#passing").hidden = !open; e.currentTarget.setAttribute("aria-expanded", String(open)); updatePassingNote(open);
+});
+$("#passing-year").addEventListener("change", () => updatePassingNote(true));
+function updatePassingNote(apply) {
+  if ($("#passing").hidden) return;
+  const d = DEGREES[degSel.value];
+  if (!d) { $("#passing-note").textContent = "Pick a degree first so we know the course length."; return; }
+  const start = +$("#passing-year").value - d[2];
+  const ay = `${start}-${String(start + 1).slice(2)}`;
+  $("#passing-note").innerHTML = `${esc(d[0])} takes ${d[2]} year${d[2] > 1 ? "s" : ""}, so admission was likely <b>${ay}</b>. Lateral entry or a gap changes this.`;
+  if (apply && [...yearSel.options].some(o => o.value === ay)) yearSel.value = ay;
+}
+
+function readForm() {
+  const code = degSel.value;
+  const spec = specSel.value === "__other" ? $("#spec-other").value : specSel.value;
+  return { uni: F.uni, uniText: uniIn.value.trim(), code, spec: NON_ODL[code] ? "" : spec, mode: document.querySelector('input[name="mode"]:checked').value || null, year: yearSel.value };
+}
+$("#form").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = readForm();
+  if (!q.uniText && !NON_ODL[q.code]) { uniIn.focus(); $("#uni-chosen").innerHTML = `<span style="color:var(--bad)">Enter the university name from the certificate.</span>`; return; }
+  if (!q.code) { degSel.focus(); return; }
+  run(q, false);
+});
+
+/* ---------- result ---------- */
+const ICON = {
+  ok: '<path d="m6 12.5 4 4 8-9" />', bad: '<path d="M7 7l10 10M17 7 7 17" />',
+  warn: '<path d="M12 7v6M12 17h.01" />', na: '<path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01" />',
+};
+const LABEL = { ok: "Approved", warn: "Needs review", bad: "Not approved", na: "Can't determine" };
+let lastText = "";
+
+function run(q, isExample) {
+  const r = check(q);
+  const el = $("#result");
+  el.className = `card result tone-${r.tone}`;
+  const u = r.uni;
+  const progLabel = NON_ODL[q.code] ? NON_ODL[q.code] : `${degName(q.code)}${specTokens(q.spec).length ? " · " + titleCase(q.spec) : ""}`;
+  const summary = [
+    ["University", u ? u.n + (r.autoMatched ? ` (matched from "${q.uniText}")` : "") : (q.uniText || "Not given")],
+    ["Programme", progLabel],
+    ["Mode", q.mode ? MODE_LABEL[q.mode] : "Not sure (checked both)"],
+    ["Admission year", q.year],
+  ];
+  lastText = [`DegreeCheck result: ${LABEL[r.tone].toUpperCase()}`, r.headline, r.detail, ...summary.map(([k, v]) => `${k}: ${v}`),
+    r.records.length ? "UGC-DEB entries: " + r.records.map(x => `${x.name} (${MODE_LABEL[x.mode]}, ${x.y})`).join("; ") : "",
+    `Source: ${D.source} (data as of ${fmtDate(D.asOf)})`].filter(Boolean).join("\n");
+
+  el.innerHTML = `
+    <div class="verdict">
+      <div class="ico" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${ICON[r.tone]}</svg></div>
+      <div>
+        <span class="pill">${LABEL[r.tone]}</span>${isExample ? '<span class="example-tag">EXAMPLE</span>' : ""}
+        <h2>${esc(r.headline)}</h2>
+        <p>${esc(r.detail)}</p>
+      </div>
+    </div>
+    <div class="rbody">
+      <section>
+        <h3>Details checked</h3>
+        <dl class="summary">${summary.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+        ${r.cands ? `<h3>Did you mean</h3><div class="cands">${r.cands.map(c => `<button type="button" data-cand="${c.i}">${esc(c.n)}<small>${esc([c.s, c.t].filter(Boolean).join(" · "))}</small></button>`).join("")}</div>` : ""}
+        ${r.history ? timeline(r, q) : ""}
+      </section>
+      <section>
+        ${r.next ? `<div class="next"><b>What to do next</b><span>${esc(r.next)}</span></div>` : ""}
+        ${r.records.length ? `<h3>UGC-DEB entries matched</h3><ul class="evidence">${r.records.slice(0, 6).map(x =>
+          `<li><span>${esc(x.name)}</span><span class="meta">${MODE_LABEL[x.mode]} · ${x.y} · ${esc(u.n)}</span></li>`).join("")}</ul>` : ""}
+        <div class="ractions">
+          <button type="button" class="btn ghost" id="copy">Copy result</button>
+          <a class="btn ghost" href="#check" id="again">Check another</a>
+          <span class="copied" id="copied" hidden>Copied</span>
+        </div>
+        <p class="fineprint">Data as of ${esc(fmtDate(D.asOf))} from the <a href="${esc(D.source)}" target="_blank" rel="noopener">UGC-DEB list</a>. This confirms programme approval, not that a specific certificate is genuine.</p>
+      </section>
+    </div>`;
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  el.querySelectorAll("[data-cand]").forEach(b => b.addEventListener("click", () => { pickUni(U[+b.dataset.cand]); run(readForm(), false); }));
+  $("#copy").addEventListener("click", copyResult);
+  $("#again").addEventListener("click", e => { e.preventDefault(); $("#check").scrollIntoView({ behavior: "smooth" }); uniIn.focus({ preventScroll: true }); });
+  if (!isExample) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+}
+
+function timeline(r, q) {
+  const has = new Set(r.history.map(x => x.y + "|" + x.mode));
+  const listed = r.uni.years;
+  const check = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12.5 4 4 8-9"/></svg>';
+  const row = mode => `<span class="lab">${mode === "ODL" ? "Distance" : "Online"}</span>` + YEARS.map(y => {
+    const on = has.has(y + "|" + mode), isQ = y === q.year && (!q.mode || q.mode === mode);
+    const cls = ["cell", on && "on", isQ && "q", !on && !listed.has(y) && "nodata"].filter(Boolean).join(" ");
+    return `<span class="${cls}" title="${y} ${MODE_LABEL[mode]}: ${on ? "approved" : listed.has(y) ? "not approved" : "university not listed this year"}">${on ? check : ""}</span>`;
+  }).join("");
+  return `<h3>Approval timeline · ${esc(degName(q.code))}${specTokens(q.spec).length && r.history.some(x => specTokens(x.spec).length) ? " · " + esc(titleCase(q.spec)) : ""}</h3>
+    <div class="tl-scroll"><div class="tl" style="--n:${YEARS.length}">
+      <span></span>${YEARS.map(y => `<span class="yr mono${y === q.year ? " q" : ""}">${y}</span>`).join("")}
+      ${row("ODL")}${row("ONLINE")}
+    </div></div>
+    <div class="legend-row"><span><i style="background:var(--accent)"></i>Approved</span><span><i style="background:var(--ok)"></i>Approved, year checked</span><span><i style="background:var(--bad-soft);border:2px solid var(--bad)"></i>Year checked, not approved</span><span><i style="background:repeating-linear-gradient(135deg,var(--sunken) 0 3px,var(--line) 3px 4px)"></i>University not in list</span></div>`;
+}
+
+async function copyResult() {
+  try { await navigator.clipboard.writeText(lastText); }
+  catch {
+    const ta = document.createElement("textarea"); ta.value = lastText; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch {} ta.remove();
+  }
+  const c = $("#copied"); c.hidden = false; setTimeout(() => { c.hidden = true; }, 1800);
+}
+
+/* ---------- example chips ---------- */
+const findUni = name => byKey.get(uniKey(name)) || resolveUni(name).u;
+function setForm({ uni, code, spec = "", mode = "", year }) {
+  pickUni(uni ? findUni(uni) : null); if (!uni) uniIn.value = "";
+  fillDegrees(code); fillSpecs(spec);
+  if (spec && specSel.value !== spec) { specSel.value = "__other"; $("#spec-other").value = spec; $("#spec-other-wrap").hidden = false; }
+  document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
+  yearSel.value = year;
+}
+const TRIES = [
+  ["Approved", { uni: "Guru Ghasidas Vishwavidyalaya", code: "MA", spec: "english literature", mode: "ONLINE", year: "2026-27" }],
+  ["Wrong mode", { uni: "Guru Ghasidas Vishwavidyalaya", code: "MA", spec: "english literature", mode: "ODL", year: "2026-27" }],
+  ["Gap in UGC list", { uni: "Indira Gandhi National Open University", code: "MBA", mode: "ODL", year: "2024-25" }],
+  ["Online B.Tech", { uni: "Amity University", code: "X-BTECH", mode: "ONLINE", year: "2024-25" }],
+];
+$("#tries").insertAdjacentHTML("beforeend", TRIES.map(([l], i) => `<button type="button" data-try="${i}">${l}</button>`).join(""));
+$("#tries").addEventListener("click", e => {
+  const b = e.target.closest("[data-try]"); if (!b) return;
+  setForm(TRIES[+b.dataset.try][1]); run(readForm(), false);
+});
+
+/* ---------- browse ---------- */
+const B = { mode: "", state: "", types: new Set(), year: "", q: "", shown: 24 };
+const states = [...new Set(U.map(u => u.s).filter(Boolean))].sort();
+$("#f-state").insertAdjacentHTML("beforeend", states.map(s => `<option>${esc(s)}</option>`).join(""));
+const TYPES = ["Central University", "State University", "State Open University", "Deemed to be University", "Private University"];
+$("#f-types").innerHTML = TYPES.map((t, i) => `<label><input type="checkbox" id="ft-${i}" value="${t}"> ${t}</label>`).join("");
+$("#f-year").insertAdjacentHTML("beforeend", [...YEARS].reverse().map(y => `<option>${y}</option>`).join(""));
+
+function filtered() {
+  const q = squash(B.q), words = fold(B.q).toLowerCase().split(/\s+/).filter(Boolean);
+  return U.filter(u =>
+    (!B.mode || u.rows.some(r => r.mode === B.mode && (!B.year || r.y === B.year))) &&
+    (!B.year || u.years.has(B.year)) &&
+    (!B.state || u.s === B.state) &&
+    (!B.types.size || B.types.has(u.t)) &&
+    (!q || u.a.includes(q) || words.every(w => u.n.toLowerCase().includes(w)) || u.k.includes(q)));
+}
+function renderBrowse() {
+  const list = filtered().sort((a, b) => progCount(b) - progCount(a));
+  $("#b-count").textContent = `${list.length} universit${list.length === 1 ? "y" : "ies"}`;
+  $("#b-grid").innerHTML = list.slice(0, B.shown).map(u => {
+    const ys = [...u.years].sort();
+    return `<article class="card uni">
+      <div class="uni-top"><span class="mono-tile" aria-hidden="true">${esc(initials(u.n))}</span>
+        <div><h3>${esc(u.n)}</h3>${u.t ? `<span class="chip">${esc(u.t)}</span>` : ""}</div></div>
+      <dl>
+        <div><dt>Modes</dt><dd class="modes">${u.modes.has("ONLINE") ? '<span class="mode-b on">Online</span>' : ""}${u.modes.has("ODL") ? '<span class="mode-b odl">Distance</span>' : ""}</dd></div>
+        <div><dt>State</dt><dd>${esc(u.s || "Not given")}</dd></div>
+        <div><dt>Programmes</dt><dd class="mono">${progCount(u)}</dd></div>
+        <div><dt>Listed</dt><dd class="mono">${ys[0]} → ${ys.at(-1).slice(5)}${ys.length < YEARS.indexOf(ys.at(-1)) - YEARS.indexOf(ys[0]) + 1 ? " (gaps)" : ""}</dd></div>
+      </dl>
+      <button type="button" class="more" data-open="${u.i}">View programmes →</button>
+    </article>`;
+  }).join("") || `<p class="hint">No university matches these filters.</p>`;
+  $("#b-more").hidden = list.length <= B.shown;
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  B.mode = b.dataset.mode; B.shown = 24; renderBrowse();
+}));
+$("#f-state").addEventListener("change", e => { B.state = e.target.value; B.shown = 24; renderBrowse(); });
+$("#f-year").addEventListener("change", e => { B.year = e.target.value; B.shown = 24; renderBrowse(); });
+$("#f-types").addEventListener("change", e => { e.target.checked ? B.types.add(e.target.value) : B.types.delete(e.target.value); B.shown = 24; renderBrowse(); });
+$("#b-search").addEventListener("input", e => { B.q = e.target.value; B.shown = 24; renderBrowse(); });
+$("#b-more").addEventListener("click", () => { B.shown += 24; renderBrowse(); });
+$("#b-grid").addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openModal(U[+b.dataset.open]); });
+
+/* ---------- modal ---------- */
+const modal = $("#modal");
+let modalUni = null;
+function openModal(u) {
+  modalUni = u;
+  $("#m-name").textContent = u.n;
+  $("#m-sub").textContent = [u.t, u.s, `${progCount(u)} programmes`].filter(Boolean).join(" · ");
+  $("#m-search").value = "";
+  $("#m-key").innerHTML = `<span><span class="dot d"></span>Distance</span><span><span class="dot o"></span>Online</span><span><span class="dot b"></span>Both</span><span class="mono">${YEARS.map(y => y.slice(2, 4)).join(" ")}</span>`;
+  renderModal();
+  if (typeof modal.showModal === "function") modal.showModal(); else modal.setAttribute("open", "");
+}
+function renderModal() {
+  const u = modalUni, f = $("#m-search").value.toLowerCase();
+  const byProg = new Map();
+  for (const r of u.rows) {
+    if (f && !r.name.toLowerCase().includes(f) && !degName(r.code).toLowerCase().includes(f)) continue;
+    if (!byProg.has(r.p)) byProg.set(r.p, { r, cells: new Map() });
+    const c = byProg.get(r.p).cells; c.set(r.y, (c.get(r.y) || 0) | (r.mode === "ONLINE" ? 2 : 1));
+  }
+  const groups = new Map();
+  for (const v of byProg.values()) { const k = v.r.code; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(v); }
+  const order = Object.keys(DEGREES);
+  $("#m-body").innerHTML = [...groups.entries()].sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])).map(([code, items]) =>
+    `<div class="m-group"><h3>${esc(DEGREES[code][1])}</h3>${items.sort((a, b) => a.r.name.localeCompare(b.r.name)).map(({ r, cells }) => {
+      const last = [...cells.keys()].sort().at(-1), lm = cells.get(last);
+      return `<div class="prog"><span class="pn">${esc(titleCase(r.name))}</span>
+        <span class="dots" aria-label="Approved years">${YEARS.map(y => { const m = cells.get(y) || 0; return `<span class="dot ${["", "d", "o", "b"][m]}" title="${y}: ${["not listed", "Distance", "Online", "Online and Distance"][m]}"></span>`; }).join("")}</span>
+        <button type="button" data-check="${r.p}" data-year="${last}" data-mode="${lm === 2 ? "ONLINE" : lm === 1 ? "ODL" : ""}">Check</button></div>`;
+    }).join("")}</div>`).join("") || `<p class="hint">No programme matches.</p>`;
+}
+$("#m-search").addEventListener("input", renderModal);
+$("#m-close").addEventListener("click", () => modal.close());
+modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
+$("#m-body").addEventListener("click", e => {
+  const b = e.target.closest("[data-check]"); if (!b) return;
+  const [, code, spec] = P[+b.dataset.check];
+  modal.close();
+  setForm({ uni: modalUni.n, code, spec, mode: b.dataset.mode, year: b.dataset.year });
+  pickUni(modalUni); fillDegrees(code); fillSpecs(spec);
+  run(readForm(), false);
+});
+
+/* ---------- boot: realistic example state ---------- */
+fillDegrees();
+setForm({ uni: "Lovely Professional University", code: "MBA", spec: "", mode: "ODL", year: "2023-24" });
+run(readForm(), true);
+renderBrowse();
+})();
+</script>
