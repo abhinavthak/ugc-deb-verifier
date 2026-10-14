@@ -16,11 +16,12 @@ They're built from the templates in `web/`:
 
 ```bash
 python3 -m ugc_deb refresh
-python3 -m ugc_deb.export_web data/deb.sqlite docs/index.html template_online.html
-python3 -m ugc_deb.export_web data/deb.sqlite docs/classic.html template.html
+python3 -m ugc_deb.export_web data/deb.sqlite docs/index.html template_online.html --standalone
+python3 -m ugc_deb.export_web data/deb.sqlite docs/classic.html template.html --standalone
 ```
 
-The pages carry a JavaScript copy of the matching rules in `verify.py`; keep the two in step.
+`--standalone` wraps the page in a full HTML document (doctype, charset, viewport); without it the
+output is the bare page body the claude.ai artifact viewer expects. The pages carry a JavaScript copy of the matching rules in `verify.py`; keep the two in step.
 The lead form on the online page is a prototype and doesn't send data anywhere yet.
 
 ## Usage

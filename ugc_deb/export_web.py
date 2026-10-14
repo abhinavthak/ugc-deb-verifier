@@ -1,8 +1,8 @@
 """Export the database as compact JSON for the web prototype.
 
     python3 -m ugc_deb.export_web data/deb.sqlite out.json
-    python3 -m ugc_deb.export_web data/deb.sqlite docs/index.html template_online.html
-    python3 -m ugc_deb.export_web data/deb.sqlite docs/classic.html template.html
+    python3 -m ugc_deb.export_web data/deb.sqlite docs/index.html template_online.html --standalone
+    python3 -m ugc_deb.export_web data/deb.sqlite docs/classic.html template.html --standalone
 """
 import json
 import re
@@ -33,7 +33,22 @@ def _display(variants: Counter) -> str:
     return name if any(c.islower() for c in name) else name.title()
 
 
-def main(db, out, template="template.html"):
+STANDALONE_HEAD = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+"""
+
+
+def standalone(page: str) -> str:
+    """Wrap a page body in a complete document (the claude.ai viewer adds this itself)."""
+    head_end = page.index("</style>") + len("</style>")
+    return STANDALONE_HEAD + page[:head_end] + "\n</head>\n<body>\n" + page[head_end:] + "\n</body>\n</html>\n"
+
+
+def main(db, out, template="template.html", wrap=False):
     con = sqlite3.connect(db)
     con.row_factory = sqlite3.Row
     rows = [dict(r) for r in con.execute("SELECT * FROM programmes WHERE uni_key != ''")]
@@ -73,9 +88,12 @@ def main(db, out, template="template.html"):
         # Inline the data into the web prototype template.
         template = (Path(__file__).resolve().parent.parent / "web" / template).read_text()
         payload = template.replace("__DEB_DATA__", payload.replace("</", "<\\/"))
+        if wrap:
+            payload = standalone(payload)
     Path(out).write_text(payload)
     print(f"{len(unis)} universities, {len(progs)} programmes, {len(out_rows)} rows")
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:4])
+    args = [a for a in sys.argv[1:] if a != "--standalone"]
+    main(*args[:3], wrap="--standalone" in sys.argv)

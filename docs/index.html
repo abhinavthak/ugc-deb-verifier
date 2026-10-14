@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>DegreeCheck Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +34,7 @@
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, p { margin: 0; }
 h1, h2 { text-wrap: balance; }
@@ -152,7 +159,7 @@ a:hover { color: var(--blue); }
 
 /* Browse */
 .browse { background: var(--surface); border-top: 1px solid var(--line); scroll-margin-top: 0; }
-.browse .wrap { padding-block: 56px 72px; display: flex; flex-direction: column; gap: 24px; }
+.browse .wrap { padding-block: 44px 56px; display: flex; flex-direction: column; gap: 20px; }
 .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
 .sec-head h2 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -.025em; }
 .sec-head p { color: var(--muted); margin-top: 6px; }
@@ -163,7 +170,7 @@ a:hover { color: var(--blue); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 20px; }
 .ucard { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
 .ucard:hover { border-color: var(--ink); }
-.ucard-body { padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ucard-body { padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .ucard-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .ucard-top .kicker { padding-top: 4px; }
 .save { width: 44px; height: 44px; margin: -10px -10px 0 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: var(--muted); flex: none; }
@@ -171,7 +178,7 @@ a:hover { color: var(--blue); }
 .save[aria-pressed="true"] { color: var(--blue); }
 .save[aria-pressed="true"] .ico { fill: currentColor; }
 .ucard h3 { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; letter-spacing: -.015em; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .chips span { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: var(--chip); }
 .chips span.more { background: none; color: var(--muted); }
 .ucard-meta { padding: 12px 18px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
@@ -186,8 +193,8 @@ a:hover { color: var(--blue); }
 
 /* FAQ */
 .faq { border-top: 1px solid var(--line); }
-.faq .wrap { padding-block: 64px 72px; display: flex; flex-wrap: wrap; gap: 32px 64px; align-items: flex-start; }
-.faq-intro { flex: 1 1 280px; display: flex; flex-direction: column; gap: 10px; }
+.faq .wrap { padding-block: 48px 56px; display: flex; flex-wrap: wrap; gap: 32px 64px; align-items: flex-start; }
+.faq-intro { flex: 1 1 280px; display: flex; flex-direction: column; gap: 10px; position: sticky; top: 24px; }
 .faq-intro h2 { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: -.025em; }
 .faq-intro p:last-child { color: var(--muted); }
 .faq-intro a { font-weight: 600; }
@@ -393,6 +400,9 @@ button.cell:hover { filter: brightness(1.08); }
   @keyframes pop { from { transform: translateY(10px); opacity: .6; } to { transform: none; opacity: 1; } }
 }
 </style>
+</head>
+<body>
+
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -815,12 +825,10 @@ function renderProgPanel() {
     const specs = new Map();
     for (const r of (u ? u.online : []).filter(r => r.code === S.code)) if (specTokens(r.spec).length) { const l = titleCase(r.spec); specs.set(l.toLowerCase(), [l, r.spec]); }
     const list = [...specs.values()].sort((a, b) => a[0].localeCompare(b[0]));
-    const isOther = S.spec && !list.some(([, v]) => v === S.spec);
     html += `<div class="p-sec"><p class="p-head">Specialisation</p><div class="pills">
       <button type="button" class="pill" data-spec="" aria-pressed="${!S.spec}">General / none</button>
-      ${list.map(([l, v]) => `<button type="button" class="pill" data-spec="${esc(v)}" aria-pressed="${S.spec === v}">${esc(l.length > 44 ? l.slice(0, 42) + "…" : l)}</button>`).join("")}
-      <button type="button" class="pill" data-spec="__other" aria-pressed="${!!isOther}">Other</button></div>
-      <input class="text-in" id="spec-other" placeholder="Specialisation as printed, e.g. Finance" value="${isOther ? esc(S.spec) : ""}" ${isOther ? "" : "hidden"}></div>`;
+      ${list.map(([l, v]) => `<button type="button" class="pill" data-spec="${esc(v)}" aria-pressed="${S.spec === v}">${esc(l.length > 44 ? l.slice(0, 42) + "…" : l)}</button>`).join("")}</div>
+      ${u && list.length ? `<p class="step-note">Don't see yours? It isn't on UGC's approved online list for this university.</p>` : ""}</div>`;
   }
   $("#p-prog").innerHTML = html;
 }
@@ -828,12 +836,9 @@ $("#p-prog").addEventListener("click", e => {
   const c = e.target.closest("[data-code]"), sp = e.target.closest("[data-spec]");
   if (c) { S.code = c.dataset.code; S.spec = ""; updateVals(); if (NON_ODL[S.code]) setOpen("year"); else renderProgPanel(); }
   else if (sp) {
-    if (sp.dataset.spec === "__other") { $("#p-prog").querySelectorAll("[data-spec]").forEach(b => b.setAttribute("aria-pressed", String(b === sp))); const i = $("#spec-other"); i.hidden = false; i.focus(); return; }
     S.spec = sp.dataset.spec; updateVals(); setOpen("year");
   }
 });
-$("#p-prog").addEventListener("input", e => { if (e.target.id === "spec-other") { S.spec = e.target.value; updateVals(); } });
-$("#p-prog").addEventListener("keydown", e => { if (e.target.id === "spec-other" && e.key === "Enter") { e.preventDefault(); setOpen("year"); } });
 
 function renderYearPanel() {
   $("#p-year").innerHTML = `<p class="p-head">Year of admission</p>
@@ -1044,7 +1049,7 @@ function renderGrid() {
         <div class="ucard-top"><span class="kicker">${esc([typeShort(u.t), u.s].filter(Boolean).join(" · ") || "India")}</span>
           <button type="button" class="save" data-save="${esc(u.k)}" aria-pressed="${saved.has(u.k)}" aria-label="Save ${esc(u.n)}">${ico("save")}</button></div>
         <h3>${esc(u.n)}</h3>
-        <div class="chips">${codes.slice(0, 4).map(c => `<span>${esc(degName(c))}</span>`).join("")}${codes.length > 4 ? `<span class="more">+${codes.length - 4}</span>` : ""}</div>
+        <div class="chips">${codes.slice(0, 3).map(c => `<span>${esc(degName(c))}</span>`).join("")}${codes.length > 3 ? `<span class="more">+${codes.length - 3}</span>` : ""}</div>
       </div>
       <div class="ucard-meta"><span>${progCount(u)} programmes</span><span class="range${cur ? "" : " old"}">${sy(ys[0])} → ${sy(ys.at(-1))}</span></div>
       <button type="button" class="ucard-link" data-open="${u.i}">View all programmes${ico("arrow", 'style="stroke-width:2.2"')}</button>
@@ -1171,3 +1176,6 @@ renderDegRow();
 renderGrid();
 })();
 </script>
+
+</body>
+</html>
