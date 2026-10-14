@@ -60,22 +60,22 @@ a:hover { color: var(--blue); }
 
 /* Header */
 .top { background: var(--paper); border-bottom: 1px solid var(--line); }
-.top .wrap { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.top .wrap { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .brand span { font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -.03em; }
 .stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 
 /* Hero */
-.hero .wrap { padding-block: 56px 64px; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
-.hero-main { flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
-.hero-copy { display: flex; flex-direction: column; gap: 14px; }
-.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.02; letter-spacing: -.035em; max-width: 13em; }
-.hero-copy > p:last-child { font-size: 17px; color: var(--muted); max-width: 36em; text-wrap: pretty; }
+.hero .wrap { padding-block: 32px 36px; display: flex; flex-wrap: wrap; gap: 40px; align-items: center; }
+.hero-main { flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.hero-copy { display: flex; flex-direction: column; gap: 10px; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 3.6vw, 48px); line-height: 1.04; letter-spacing: -.035em; max-width: 16em; }
+.hero-copy > p:last-child { font-size: 16px; color: var(--muted); max-width: 40em; text-wrap: pretty; }
 
 /* Search box */
 .sform { position: relative; }
 .sbox { background: var(--surface); border: 1px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); display: grid; grid-template-columns: 1.35fr 1fr 1fr auto; }
-.seg { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-right: 1px solid var(--line); min-height: 44px; min-width: 0; }
+.seg { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 11px 18px; border-right: 1px solid var(--line); min-height: 44px; min-width: 0; }
 .seg:hover, .seg.on { background: var(--paper); }
 .seg:first-child { border-radius: 13px 0 0 13px; }
 .seg input { all: unset; font-size: 16px; font-weight: 500; color: var(--ink); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -83,8 +83,8 @@ a:hover { color: var(--blue); }
 .seg .val { font-size: 16px; font-weight: 500; color: var(--hint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .seg .val.set { color: var(--ink); }
 .seg:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
-.go-wrap { padding: 10px; display: flex; }
-.go { min-height: 52px; padding: 0 22px; font-size: 16px; }
+.go-wrap { padding: 8px; display: flex; }
+.go { min-height: 48px; padding: 0 22px; font-size: 16px; }
 .s-hint { margin-top: 12px; font-size: 13.5px; font-weight: 600; color: var(--bad); }
 
 .panel { position: absolute; top: calc(100% + 12px); z-index: 30; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 24px 60px rgba(19, 22, 28, .2); padding: 18px; max-height: 480px; overflow: auto; }
@@ -114,25 +114,25 @@ a:hover { color: var(--blue); }
 .step-note { margin-top: 8px; font-size: 13px; color: var(--muted); }
 
 /* Popular checks */
-.popular { margin-top: -6px; display: flex; flex-direction: column; gap: 10px; }
-.pop { min-height: 44px; padding: 0 8px 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; max-width: 100%; }
+.popular { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.pop { min-height: 38px; padding: 0 6px 0 12px; font-size: 13.5px !important; gap: 8px !important; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; max-width: 100%; }
 .pop:hover { border-color: var(--ink); }
 .pop b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pop span { color: var(--muted); }
-.pop .arrow { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; color: var(--ink); }
+.pop .arrow { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; color: var(--ink); }
 
 /* Lead card */
-.lead { flex: 1 1 340px; max-width: 400px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 24px; }
-.lead h2 { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
-.lead .sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.lead { flex: 1 1 340px; max-width: 380px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 24px; }
+.lead h2 { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -.02em; }
+.lead .sub { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
 .lead .about { font-size: 13px; color: var(--muted); margin-top: 6px; }
 .lead .about b { color: var(--ink); font-weight: 600; }
-.lead form { display: flex; flex-direction: column; gap: 12px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
+.lead form { display: flex; flex-direction: column; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
 .field label { font-size: 13px; font-weight: 600; }
-.field input, .field select { height: 46px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; }
+.field input, .field select { height: 42px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; }
 .field input:focus, .field select:focus, .phone:focus-within { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
-.phone { display: flex; align-items: center; height: 46px; border: 1px solid var(--field); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.phone { display: flex; align-items: center; height: 42px; border: 1px solid var(--field); border-radius: 8px; overflow: hidden; background: var(--surface); }
 .phone span { padding: 0 10px 0 12px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--line-soft); color: var(--muted); font-family: var(--mono); font-size: 14px; }
 .phone input { flex: 1; min-width: 0; height: 100%; border: 0; padding: 0 12px; background: transparent; font-size: 15px; outline: none; }
 .field.bad input, .field.bad select, .field.bad .phone { border-color: var(--bad); background: var(--bad-soft); }
@@ -141,8 +141,8 @@ a:hover { color: var(--blue); }
 .consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ink); flex: none; }
 .consent.bad { color: var(--bad); }
 .ferr { font-size: 13px; color: var(--bad); font-weight: 600; }
-.lead .cta { min-height: 50px; font-size: 16px; }
-.lead-done { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
+.lead .cta { min-height: 46px; font-size: 15.5px; }
+.lead-done { min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
 .tick { width: 60px; height: 60px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; }
 .tick .ico { width: 28px; height: 28px; stroke-width: 2.6; }
 .lead-done h2 { font-size: 24px; }
@@ -360,7 +360,7 @@ button.cell:hover { filter: brightness(1.08); }
   .wrap { padding-inline: 16px; }
   .top .wrap { height: 60px; }
   .stamp { display: none; }
-  .hero .wrap { padding-block: 32px 40px; gap: 32px; }
+  .hero .wrap { padding-block: 24px 32px; gap: 24px; }
   .hero-copy > p:last-child { font-size: 15.5px; }
   .lead { max-width: none; }
   .sec-head h2, .faq-intro h2 { font-size: 26px; }
@@ -450,10 +450,7 @@ button.cell:hover { filter: brightness(1.08); }
           <p class="s-hint" id="s-hint" hidden></p>
         </form>
 
-        <div class="popular">
-          <span class="kicker">Popular checks</span>
-          <div class="pills" id="popular"></div>
-        </div>
+        <div class="popular" id="popular"><span class="kicker">Popular checks</span></div>
       </div>
 
       <aside class="lead" id="lead" aria-labelledby="lead-title">
@@ -825,7 +822,6 @@ function renderProgPanel() {
       <button type="button" class="pill" data-spec="__other" aria-pressed="${!!isOther}">Other</button></div>
       <input class="text-in" id="spec-other" placeholder="Specialisation as printed, e.g. Finance" value="${isOther ? esc(S.spec) : ""}" ${isOther ? "" : "hidden"}></div>`;
   }
-  html += `<div class="p-sec"><p class="p-head">Professional degrees</p><div class="pills">${Object.entries(NON_ODL).map(([c, n]) => `<button type="button" class="pill" data-code="${c}" aria-pressed="${S.code === c}">${esc(n)}</button>`).join("")}</div></div>`;
   $("#p-prog").innerHTML = html;
 }
 $("#p-prog").addEventListener("click", e => {
@@ -881,7 +877,7 @@ const POP = [["Chandigarh University", "MBA", "2024-25"], ["Amity University", "
   .map(([n, code, y]) => { const u = byKey.get(uniKey(n)); if (!u) return null;
     const yr = u.online.some(r => r.code === code && r.y === y) ? y : (u.online.filter(r => r.code === code).map(r => r.y).sort().at(-1));
     return yr ? { u, code, y: yr } : null; }).filter(Boolean);
-$("#popular").innerHTML = POP.map((p, i) => `<button type="button" class="pop" data-pop="${i}"><b>${esc(p.u.n)}</b><span>${esc(degName(p.code))}</span><span class="mono" style="font-size:12.5px">${sy(p.y)}</span><span class="arrow">${ico("arrow", 'style="width:14px;height:14px;stroke-width:2.2"')}</span></button>`).join("");
+$("#popular").insertAdjacentHTML("beforeend", POP.map((p, i) => `<button type="button" class="pop" data-pop="${i}"><b>${esc(p.u.n)}</b><span>${esc(degName(p.code))}</span><span class="mono" style="font-size:12.5px">${sy(p.y)}</span><span class="arrow">${ico("arrow", 'style="width:13px;height:13px;stroke-width:2.2"')}</span></button>`).join(""));
 $("#popular").addEventListener("click", e => {
   const b = e.target.closest("[data-pop]"); if (!b) return;
   const p = POP[+b.dataset.pop]; pickUni(p.u, false); S.code = p.code; S.spec = ""; S.year = p.y; updateVals(); runFromBar();
