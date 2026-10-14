@@ -112,12 +112,11 @@ a:hover { color: var(--blue); }
 .ybtn:hover { border-color: var(--ink); }
 .ybtn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .ybtn.pre { color: var(--hint); }
+.ybtn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 6px 4px; }
+.yst { font-family: var(--body); font-size: 11px; font-weight: 600; color: var(--ok); }
+.ybtn.pre .yst { color: var(--hint); font-weight: 500; }
+.ybtn[aria-pressed="true"] .yst { color: #fff; }
 .text-in { width: 100%; height: 46px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; margin-top: 10px; }
-.stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.stepper b { display: block; font-weight: 600; font-size: 14px; }
-.stepper small { display: block; font-size: 12.5px; color: var(--muted); }
-.step { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 600; }
-.step button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--field); background: var(--surface); cursor: pointer; display: grid; place-items: center; }
 .step-note { margin-top: 8px; font-size: 13px; color: var(--muted); }
 
 /* Popular checks */
@@ -766,7 +765,7 @@ function seal(kind, text, size = 120) {
 }
 
 /* ---------- search box ---------- */
-const S = { uni: null, code: "", spec: "", year: "", passing: +LAST.slice(0, 4) + 1 };
+const S = { uni: null, code: "", spec: "", year: "" };
 const uniIn = $("#q-uni");
 let openSeg = null, hl = -1, uniOpts = [];
 function setOpen(seg) {
@@ -811,7 +810,7 @@ uniIn.addEventListener("keydown", e => {
   else if (e.key === "Enter" && hl >= 0 && uniOpts[hl]) { e.preventDefault(); pickUni(uniOpts[hl], true); }
 });
 $("#p-uni").addEventListener("click", e => { const b = e.target.closest("[data-u]"); if (b) pickUni(U[+b.dataset.u], true); });
-function pickUni(u, advance) { S.uni = u; uniIn.value = u ? u.n : ""; $("#s-hint").hidden = true; if (advance) setOpen("prog"); }
+function pickUni(u, advance) { showEarlier = false; S.uni = u; uniIn.value = u ? u.n : ""; $("#s-hint").hidden = true; if (advance) setOpen("prog"); }
 
 function renderProgPanel() {
   const u = S.uni, have = u ? new Set(u.online.map(r => r.code)) : null;
@@ -834,33 +833,38 @@ function renderProgPanel() {
 }
 $("#p-prog").addEventListener("click", e => {
   const c = e.target.closest("[data-code]"), sp = e.target.closest("[data-spec]");
-  if (c) { S.code = c.dataset.code; S.spec = ""; updateVals(); if (NON_ODL[S.code]) setOpen("year"); else renderProgPanel(); }
+  if (c) { showEarlier = false; S.code = c.dataset.code; S.spec = ""; updateVals(); if (NON_ODL[S.code]) setOpen("year"); else renderProgPanel(); }
   else if (sp) {
     S.spec = sp.dataset.spec; updateVals(); setOpen("year");
   }
 });
 
+let showEarlier = false;
+function programmeYears() {
+  // Online-approved years for the chosen university + programme (+ specialisation), if known.
+  if (!S.uni || !DEGREES[S.code]) return null;
+  const rows = S.uni.online.filter(r => r.code === S.code && (!specTokens(S.spec).length || specMatches(S.spec, r.spec)));
+  return rows.length ? new Set(rows.map(r => r.y)) : null;
+}
 function renderYearPanel() {
+  const on = programmeYears();
+  const all = [...ALL_YEARS, ...PRE.filter(y => !ALL_YEARS.includes(y))].sort();
+  const first = on ? [...on].sort()[0] : FIRST;
+  const inRange = all.filter(y => y >= first).reverse(), earlier = all.filter(y => y < first).reverse();
+  const btn = y => {
+    const st = on ? (on.has(y) ? "Approved" : "Not online") : "";
+    return `<button type="button" class="ybtn${on && !on.has(y) ? " pre" : ""}" data-y="${y}" aria-pressed="${S.year === y}"${st ? ` aria-label="${fy(y)}: ${st.toLowerCase()}"` : ""}>${fy(y)}${st ? `<small class="yst">${st}</small>` : ""}</button>`;
+  };
   $("#p-year").innerHTML = `<p class="p-head">Year of admission</p>
-    <div class="years-grid">${[...YEARS].reverse().map(y => `<button type="button" class="ybtn" data-y="${y}" aria-pressed="${S.year === y}">${fy(y)}</button>`).join("")}
-    ${PRE.slice().reverse().map(y => `<button type="button" class="ybtn pre" data-y="${y}" aria-pressed="${S.year === y}">${fy(y)}</button>`).join("")}</div>
-    <div class="p-sec"><div class="stepper"><span><b>Only know the passing year?</b><small>We'll work out admission from course length</small></span>
-      <span class="step"><button type="button" data-py="-1" aria-label="Earlier passing year">${ico("minus", 'style="width:14px;height:14px"')}</button><span id="py">${S.passing}</span><button type="button" data-py="1" aria-label="Later passing year">${ico("plus", 'style="width:14px;height:14px"')}</button></span></div>
-      <p class="step-note" id="py-note"></p></div>`;
-  pyNote(false);
+    ${on ? `<p class="step-note" style="margin:-6px 0 12px">${esc(degName(S.code))} at ${esc(S.uni.n)}: online since ${fy(first)}</p>` : ""}
+    <div class="years-grid">${inRange.map(btn).join("")}${showEarlier ? earlier.map(btn).join("") : ""}</div>
+    ${earlier.length && !showEarlier ? `<button type="button" class="linkbtn" data-earlier style="margin-top:6px;font-size:13.5px">Earlier year</button>` : ""}`;
 }
 $("#p-year").addEventListener("click", e => {
-  const y = e.target.closest("[data-y]"), p = e.target.closest("[data-py]");
+  const y = e.target.closest("[data-y]");
   if (y) { S.year = y.dataset.y; updateVals(); setOpen(null); runFromBar(); }
-  else if (p) { S.passing += +p.dataset.py; $("#py").textContent = S.passing; pyNote(true); }
+  else if (e.target.closest("[data-earlier]")) { showEarlier = true; renderYearPanel(); }
 });
-function pyNote(apply) {
-  const d = DEGREES[S.code], el = $("#py-note"); if (!el) return;
-  if (!d) { el.textContent = "Choose a degree first so we know the course length."; return; }
-  const st = S.passing - d[2], ay = `${st}-${String(st + 1).slice(2)}`;
-  el.innerHTML = `${esc(d[0])} takes ${d[2]} year${d[2] > 1 ? "s" : ""}: admission was likely <b class="mono">${fy(ay)}</b>.`;
-  if (apply) { S.year = ay; updateVals(); $("#p-year").querySelectorAll("[data-y]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.y === ay))); }
-}
 function updateVals() {
   const vp = $("#v-prog"), vy = $("#v-year");
   vp.textContent = S.code ? degName(S.code) + (specTokens(S.spec).length ? " · " + titleCase(S.spec) : "") : "Add degree";
@@ -952,7 +956,8 @@ function renderResult() {
         return `<li>${pick ? `<button type="button" class="${cls}" data-pick="${y}" aria-pressed="${you}" aria-label="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></button>`
           : `<span class="${cls}" ${you ? 'aria-current="true"' : ""} title="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></span>`}</li>`;
       }).join("")}</ol>
-      ${!r ? `<p class="disclaim">Tap your year. Green years were approved online; you can switch years any time.</p>` : ""}
+      ${!r ? `<p class="disclaim">Tap your year. Green years were approved online; you can switch years any time.</p>`
+        : pick ? `<p class="disclaim">${q.year === LAST ? `Showing ${fy(LAST)}, the latest admission year. ` : ""}Tap another year to check it.</p>` : ""}
       ${ev ? `<p class="evidence">${ico("doc")}<span>UGC-DEB entry: <b>${esc(titleCase(ev.name))}</b> · ${ev.mode === "ONLINE" ? "Online" : "Distance"} · ${fy(ev.y)} · <a href="${esc(D.source)}" target="_blank" rel="noopener">Source</a></span></p>` : ""}
       ${r && r.tone !== "ok" && r.odlYears && r.odlYears.length ? `<p class="evidence">${ico("bank")}<span>Distance (ODL) approvals for this programme: ${esc(yearRange(r.odlYears))}</span></p>` : ""}
     </div>` : ""}
@@ -1166,7 +1171,7 @@ function openUni(u) {
 dU.addEventListener("click", e => {
   const t = e.target;
   const c = t.closest("[data-prog]");
-  if (c) { openResult({ uni: curUni, uniText: curUni.n, code: c.dataset.prog, spec: c.dataset.spec, year: "" }, true); return; }
+  if (c) { openResult({ uni: curUni, uniText: curUni.n, code: c.dataset.prog, spec: c.dataset.spec, year: LAST }, true); return; }
   if (t.closest("#u-save")) { toggleSave(curUni.k); const b = $("#u-save"); b.setAttribute("aria-pressed", String(saved.has(curUni.k))); b.lastChild.textContent = saved.has(curUni.k) ? "Saved" : "Save"; renderGrid(); }
   if (t.closest("#u-check")) { dU.close(); pickUni(curUni, false); S.code = ""; S.spec = ""; S.year = ""; updateVals(); $("#top").scrollIntoView({ behavior: "smooth" }); setOpen("prog"); }
 });
