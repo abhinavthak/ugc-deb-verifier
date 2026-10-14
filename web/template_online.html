@@ -941,14 +941,13 @@ function renderResult() {
     ${showStrip ? `<div class="strip-sec">
       <div class="row-between"><h3>${r ? "Online approval by admission year" : "Your admission year"}</h3>
         <div class="key"><span><i class="k-on"></i>Approved online</span>${r ? `<span><i class="k-you"></i>Your year</span>` : ""}</div></div>
-      <ol class="strip" style="--n:${ALL_YEARS.length}" ${pick ? 'role="group" aria-label="Admission year"' : ""}>${ALL_YEARS.map(y => {
+      <ol class="strip" style="--n:${ALL_YEARS.length}" role="group" aria-label="Admission year">${ALL_YEARS.map(y => {
         const on = hist.has(y), you = y === q.year;
         const cls = `cell ${on ? "on" : "off"}${you ? " you" : ""}`, sub = you ? "Your year" : on ? "Online" : "Not online";
-        return `<li>${pick ? `<button type="button" class="${cls}" data-pick="${y}" aria-pressed="${you}" aria-label="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></button>`
-          : `<span class="${cls}" ${you ? 'aria-current="true"' : ""} title="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></span>`}</li>`;
+        return `<li><button type="button" class="${cls}" data-pick="${y}" aria-pressed="${you}" aria-label="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></button></li>`;
       }).join("")}</ol>
       ${!r ? `<p class="disclaim">Tap your year. Green years were approved online; you can switch years any time.</p>`
-        : pick ? `<p class="disclaim">${q.year === LAST ? `Showing ${fy(LAST)}, the latest admission year. ` : ""}Tap another year to check it.</p>` : ""}
+        : `<p class="disclaim">${pick && q.year === LAST ? `Showing ${fy(LAST)}, the latest admission year. ` : ""}Tap another year to check it.</p>`}
       ${ev ? `<p class="evidence">${ico("doc")}<span>UGC-DEB entry: <b>${esc(titleCase(ev.name))}</b> · ${ev.mode === "ONLINE" ? "Online" : "Distance"} · ${fy(ev.y)} · <a href="${esc(D.source)}" target="_blank" rel="noopener">Source</a></span></p>` : ""}
       ${r && r.tone !== "ok" && r.odlYears && r.odlYears.length ? `<p class="evidence">${ico("bank")}<span>Distance (ODL) approvals for this programme: ${esc(yearRange(r.odlYears))}</span></p>` : ""}
     </div>` : ""}
@@ -975,7 +974,11 @@ dR.addEventListener("click", e => {
   if (t.closest("#r-again")) { dR.close(); $("#top").scrollIntoView({ behavior: "smooth" }); setOpen("uni"); uniIn.focus({ preventScroll: true }); }
   else if (t.closest("#r-ask")) { dR.close(); if (dU.open) dU.close(); prefillLead(R.r && R.r.uni ? R.r.uni : R.q.uni, R.q.code); }
   else if (t.closest("#r-share")) shareResult();
-  else if (t.closest("[data-pick]")) { R.q = { ...R.q, year: t.closest("[data-pick]").dataset.pick }; renderResult(); }
+  else if (t.closest("[data-pick]")) {
+    const y = t.closest("[data-pick]").dataset.pick;
+    R.q = { ...R.q, year: y }; renderResult();
+    if (!R.pick) { S.year = y; updateVals(); }
+  }
   else if (t.closest("[data-cand]")) { const u = U[+t.closest("[data-cand]").dataset.cand]; pickUni(u, false); R.q = { ...R.q, uni: u, uniText: u.n }; renderResult(); }
 });
 async function shareResult() {

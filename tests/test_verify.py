@@ -23,6 +23,10 @@ ROWS = [
      "Master of Business Administration(Marketing Management)"),
     ("2023-24", "ODL (Recognised)", "Indira Gandhi National Open University", "Delhi", "BACHELOR OF ARTS"),
     ("2026-27", "Open and Distance Learning (ODL)", "", "", "MASTER OF ARTS (ARABIC)"),
+    # Same institution renamed between years
+    ("2022-23", "Online (Entitled)", "JAIN UNIVERSITY", "Karnataka", "MASTER OF COMPUTER APPLICATIONS"),
+    ("2023-24", "Online (Entitled)", "JAIN UNIVERSITY", "Karnataka", "MASTER OF COMPUTER APPLICATIONS"),
+    ("2025-26", "Online(OL)", "JAIN(Deemed-to- be University)", "KARNATAKA", "MASTER OF COMPUTER APPLICATIONS"),
 ]
 
 
@@ -103,6 +107,12 @@ class VerifierTest(unittest.TestCase):
     def test_out_of_coverage(self):
         r = self.check("IGNOU", "MBA", "ODL", "2018")
         self.assertEqual(r.verdict, "OUT_OF_COVERAGE")
+
+    def test_renamed_university_is_one_institution(self):
+        for name in ["JAIN (Deemed-to-be University)", "Jain University"]:
+            r = self.check(name, "MCA", "online", "2022-23")
+            self.assertEqual(r.verdict, "APPROVED", name)
+            self.assertEqual(sorted(r.approval_history), ["2022-23", "2023-24", "2025-26"])
 
     def test_professional_degree(self):
         for prog in ["B.Tech", "LLB", "B.Sc Nursing", "MBBS", "B.Pharm"]:

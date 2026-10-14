@@ -12,6 +12,7 @@ import html
 import re
 import sqlite3
 import urllib.request
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from . import normalize as N
@@ -79,13 +80,30 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 """
 
 
+def merge_name_variants(rows: list[dict]) -> list[dict]:
+    """Give one uni_key to spellings of the same institution.
+
+    The source renames universities between years ("JAIN UNIVERSITY" in 2020-24,
+    "JAIN (Deemed-to-be University)" from 2024). Keys that share a distinctive name
+    (university_core) and a state are treated as one; the most common key wins.
+    """
+    counts: dict[tuple, Counter] = defaultdict(Counter)
+    for r in rows:
+        if r["uni_key"]:
+            counts[(N.university_core(r["uni_key"]), N.squash(r["state"]))][r["uni_key"]] += 1
+    canonical = {k: c.most_common(1)[0][0] for c in counts.values() if len(c) > 1 for k in c}
+    for r in rows:
+        r["uni_key"] = canonical.get(r["uni_key"], r["uni_key"])
+    return rows
+
+
 def build_db(rows: list[dict], db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     tmp = db_path.with_suffix(".tmp")
     tmp.unlink(missing_ok=True)
     con = sqlite3.connect(tmp)
     con.executescript(SCHEMA)
-    enriched = [enrich(r) for r in rows]
+    enriched = merge_name_variants([enrich(r) for r in rows])
     cols = list(enriched[0].keys())
     con.executemany(
         f"INSERT INTO programmes ({','.join(cols)}) VALUES ({','.join('?' * len(cols))})",
