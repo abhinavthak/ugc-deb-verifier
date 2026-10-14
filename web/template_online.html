@@ -1,393 +1,414 @@
 <title>DegreeCheck Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
-/* Light only, by request. Layout: compact marketplace-style — pill search + verdict on the left, sticky lead "booking" card on the right above the fold; listing grid with category strip below. */
+/* Light only. Layout: ruled-paper hero (question + boxed search left, lead card right) → university cards → FAQ; results open as a dialog (bottom sheet on phones). */
 :root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --sunken: #f7f7f7;
-  --hover: #ebebeb;
-  --line: #dddddd;
-  --line-soft: #ebebeb;
-  --field: #b0b0b0;
-  --ink: #222222;
-  --muted: #6a6a6a;
-  --accent: #e3264f;
-  --accent-2: #c8115e;
-  --accent-ink: #ffffff;
-  --accent-soft: #fff0f3;
-  --ok: #0a7d32;   --ok-soft: #ebf7ef;
-  --warn: #a35c00; --warn-soft: #fff5e5;
-  --bad: #c13515;  --bad-soft: #fff1ee;
-  --na: #6a6a6a;   --na-soft: #f2f2f2;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .08), 0 4px 12px rgba(0, 0, 0, .05);
-  --shadow: 0 6px 20px rgba(0, 0, 0, .12);
-  --shadow-lg: 0 8px 28px rgba(0, 0, 0, .18);
   color-scheme: light;
-  --font: "Plus Jakarta Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --paper: #F5F4EF;
+  --rule: #E9E6DC;
+  --surface: #FFFFFF;
+  --ink: #13161C;
+  --muted: #4A4E55;
+  --hint: #6B6F76;
+  --line: #DEDBD2;
+  --line-soft: #EAE7DF;
+  --field: #A9A59A;
+  --chip: #F0EFEA;
+  --dash: #C9C5BA;
+  --blue: #2B3BD1;
+  --ok: #17663E;   --ok-soft: #E5F2EA;
+  --warn: #8A4B00; --warn-soft: #FBF0DC;
+  --bad: #A52A1C;  --bad-soft: #FBE9E5;
+  --na: #4E535B;   --na-soft: #ECEBE6;
+  --scrim: rgba(19, 22, 28, .55);
+  --display: "Bricolage Grotesque", "Public Sans", "Helvetica Neue", sans-serif;
+  --body: "Public Sans", "Helvetica Neue", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
-
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-h1, h2, h3 { margin: 0; text-wrap: balance; line-height: 1.2; letter-spacing: -.01em; }
-p { margin: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+h1, h2 { text-wrap: balance; }
 button, input, select { font: inherit; color: inherit; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-svg.i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 40px; }
-.hr { height: 1px; background: var(--line-soft); border: 0; margin: 0; }
+a { color: var(--ink); }
+a:hover { color: var(--blue); }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 32px; }
+.ruled { background-color: var(--paper); background-image: repeating-linear-gradient(180deg, transparent 0 31px, var(--rule) 31px 32px); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); }
+.kicker { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Buttons */
+.btn { min-height: 46px; padding: 0 20px; border-radius: 9px; border: 0; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-blue:hover { color: #fff; filter: brightness(1.08); }
+.btn-ink { background: var(--ink); color: #fff; }
+.btn-ink:hover { color: #fff; filter: brightness(1.3); }
+.btn-line { background: var(--surface); border: 1px solid var(--ink); font-weight: 600; }
+.btn-line:hover { background: var(--paper); color: var(--ink); }
+.linkbtn { min-height: 44px; padding: 0 4px; border: 0; background: none; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pill { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; cursor: pointer; flex: none; }
+.pill:hover { border-color: var(--ink); }
+.pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 600; }
+.xbtn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: none; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+.xbtn:hover { background: var(--paper); }
 
 /* Header */
-.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: var(--bg); border-bottom: 1px solid var(--line-soft); }
-.top .wrap { display: flex; justify-content: space-between; align-items: center; height: 64px; }
-.top-link { font-size: 14px; font-weight: 600; text-decoration: none; padding: 10px 14px; border-radius: 999px; }
-.top-link:hover { background: var(--sunken); }
-.brand { display: flex; align-items: center; gap: 8px; color: var(--accent); text-decoration: none; font-weight: 800; font-size: 20px; letter-spacing: -.03em; }
-.nav { display: flex; gap: 6px; }
-.nav a { text-decoration: none; padding: 10px 14px; border-radius: 999px; color: var(--muted); font-weight: 500; }
-.nav a:hover { background: var(--sunken); color: var(--ink); }
-.nav a[aria-current="true"] { color: var(--ink); font-weight: 600; }
-.top-right { justify-self: end; display: flex; align-items: center; gap: 8px; }
-.pill-btn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; }
-.pill-btn:hover { box-shadow: var(--shadow-sm); }
+.top { background: var(--paper); border-bottom: 1px solid var(--line); }
+.top .wrap { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand span { font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -.03em; }
+.stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 
-/* Hero grid */
-.hero { display: grid; grid-template-columns: minmax(0, 1fr) 376px; grid-template-areas: "left lead" "result lead"; column-gap: 56px; padding-block: 28px 32px; align-items: start; }
-.fold-left { grid-area: left; align-self: center; display: grid; min-width: 0; position: relative; z-index: 30; }
-.intro { display: grid; gap: 8px; padding-bottom: 22px; }
-.intro h1 { font-size: clamp(26px, 2.8vw, 34px); font-weight: 700; letter-spacing: -.025em; }
-.intro p { color: var(--muted); font-size: 15px; max-width: 40em; }
-.stats { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 4px; font-size: 13px; color: var(--muted); }
-.stats b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Hero */
+.hero .wrap { padding-block: 56px 64px; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
+.hero-main { flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+.hero-copy { display: flex; flex-direction: column; gap: 14px; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.02; letter-spacing: -.035em; max-width: 13em; }
+.hero-copy > p:last-child { font-size: 17px; color: var(--muted); max-width: 36em; text-wrap: pretty; }
 
-/* Search pill */
-.search-area { position: relative; z-index: 30; }
-.try { margin-top: 14px; font-size: 13.5px; color: var(--muted); }
-.try button { border: 0; background: none; padding: 0; font: inherit; color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.sbar { position: relative; display: flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); box-shadow: var(--shadow-sm), 0 2px 10px rgba(0, 0, 0, .06); }
-.sbar.active { background: var(--hover); border-color: var(--hover); }
-.seg { flex: 1 1 0; min-width: 0; display: grid; gap: 1px; text-align: left; padding: 9px 22px; border-radius: 999px; border: 0; background: transparent; cursor: pointer; position: relative; }
-.seg:first-child { flex-grow: 1.4; padding-left: 28px; }
-.seg:hover { background: var(--hover); }
-.sbar.active .seg:hover { background: var(--line-soft); }
-.seg.on, .sbar.active .seg.on:hover { background: var(--surface); box-shadow: var(--shadow); }
-.seg .lab, .seg label { font-size: 12px; font-weight: 700; letter-spacing: .01em; cursor: pointer; }
-.seg .val, .seg input { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.seg .val.set { color: var(--ink); font-weight: 500; }
-.seg input { border: 0; background: transparent; padding: 0; outline: none; width: 100%; color: var(--ink); }
-.seg input::placeholder { color: var(--muted); }
-.divider { width: 1px; height: 32px; background: var(--line); flex: none; }
-.sbar.active .divider, .seg.on + .divider, .divider:has(+ .seg.on) { background: transparent; }
-.go { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; min-width: 44px; margin-right: 7px; padding: 0 13px; border-radius: 999px; border: 0; cursor: pointer; color: var(--accent-ink); font-weight: 700; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: padding .2s ease; }
-.go .t { display: none; }
-.sbar.active .go { padding: 0 20px 0 16px; }
-.sbar.active .go .t { display: inline; }
-.go svg.i { stroke-width: 2.6; width: 18px; height: 18px; }
+/* Search box */
+.sform { position: relative; }
+.sbox { background: var(--surface); border: 1px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); display: grid; grid-template-columns: 1.35fr 1fr 1fr auto; }
+.seg { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-right: 1px solid var(--line); min-height: 44px; min-width: 0; }
+.seg:hover, .seg.on { background: var(--paper); }
+.seg:first-child { border-radius: 13px 0 0 13px; }
+.seg input { all: unset; font-size: 16px; font-weight: 500; color: var(--ink); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg input::placeholder { color: var(--hint); }
+.seg .val { font-size: 16px; font-weight: 500; color: var(--hint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg .val.set { color: var(--ink); }
+.seg:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.go-wrap { padding: 10px; display: flex; }
+.go { min-height: 52px; padding: 0 22px; font-size: 16px; }
+.s-hint { margin-top: 12px; font-size: 13.5px; font-weight: 600; color: var(--bad); }
 
-.panel { position: absolute; top: calc(100% + 12px); z-index: 35; background: var(--surface); border-radius: 32px; box-shadow: var(--shadow-lg); padding: 24px; max-height: 520px; overflow: auto; }
-#p-uni { left: 0; width: min(480px, 100%); padding: 16px 12px; }
-#p-prog { left: 18%; width: min(560px, 100%); }
-#p-year { right: 0; width: 400px; }
-.p-title { font-size: 12px; font-weight: 700; padding: 4px 12px 10px; }
-.p-sub { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-.opt { display: flex; align-items: center; gap: 14px; width: 100%; padding: 10px 12px; border: 0; background: none; border-radius: 14px; cursor: pointer; text-align: left; }
-.opt:hover, .opt.hl { background: var(--sunken); }
-.ibox { flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--sunken); display: grid; place-items: center; }
-.opt:hover .ibox, .opt.hl .ibox { background: var(--hover); }
-.opt .n { display: block; font-weight: 500; font-size: 15px; }
-.opt .m { display: block; font-size: 13px; color: var(--muted); }
-.opt .m.warn { color: var(--warn); }
-.empty-note { padding: 10px 12px; color: var(--muted); font-size: 14px; }
-
-.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
-.chip-btn { display: grid; gap: 8px; justify-items: start; padding: 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; text-align: left; font-weight: 600; font-size: 14px; }
-.chip-btn small { font-weight: 400; color: var(--muted); font-size: 12px; line-height: 1.3; }
-.chip-btn:hover { border-color: var(--ink); }
-.chip-btn[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: var(--sunken); }
-.chip-btn.dim { color: var(--muted); }
-.pgroup + .pgroup { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line-soft); }
+.panel { position: absolute; top: calc(100% + 12px); z-index: 30; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 24px 60px rgba(19, 22, 28, .2); padding: 18px; max-height: 480px; overflow: auto; }
+#p-uni { left: 0; width: min(500px, 100%); padding: 8px; }
+#p-prog { left: 25%; width: min(560px, 100%); }
+#p-year { right: 0; width: min(420px, 100%); }
+.p-head { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+.p-sec + .p-sec { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+.opt { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; padding: 8px 12px; border: 0; background: none; border-radius: 10px; cursor: pointer; text-align: left; }
+.opt:hover, .opt.hl { background: var(--paper); }
+.opt b { display: block; font-weight: 600; }
+.opt small { display: block; font-size: 13px; color: var(--muted); }
+.opt small.warn { color: var(--warn); }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-.pill { height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 14px; }
-.pill:hover { border-color: var(--ink); }
-.pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-.other-in { margin-top: 10px; width: 100%; height: 44px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); }
+.pill.dim { color: var(--hint); border-style: dashed; }
+.years-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ybtn { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--mono); font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.ybtn:hover { border-color: var(--ink); }
+.ybtn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.ybtn.pre { color: var(--hint); }
+.text-in { width: 100%; height: 46px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; margin-top: 10px; }
+.stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stepper b { display: block; font-weight: 600; font-size: 14px; }
+.stepper small { display: block; font-size: 12.5px; color: var(--muted); }
+.step { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 600; }
+.step button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--field); background: var(--surface); cursor: pointer; display: grid; place-items: center; }
+.step-note { margin-top: 8px; font-size: 13px; color: var(--muted); }
 
-.years { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.years .pill { height: 44px; border-radius: 12px; font-variant-numeric: tabular-nums; }
-.years .pill.pre { color: var(--muted); }
-.stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 18px; margin-top: 18px; border-top: 1px solid var(--line-soft); }
-.stepper .q { font-weight: 600; }
-.stepper .q small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
-.step { display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; font-weight: 500; }
-.step button { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--field); background: var(--surface); cursor: pointer; display: grid; place-items: center; }
-.step button:hover { border-color: var(--ink); }
-.step-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
-.field-hint { margin: 10px 0 0 32px; font-size: 13px; color: var(--bad); font-weight: 500; }
+/* Popular checks */
+.popular { margin-top: -6px; display: flex; flex-direction: column; gap: 10px; }
+.pop { min-height: 44px; padding: 0 8px 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; max-width: 100%; }
+.pop:hover { border-color: var(--ink); }
+.pop b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pop span { color: var(--muted); }
+.pop .arrow { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; color: var(--ink); }
 
 /* Lead card */
-.lead-col { grid-area: lead; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); }
-.lead { border: 1px solid var(--line); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); background: var(--surface); display: grid; gap: 12px; }
-.lead h2 { font-size: 18px; font-weight: 700; }
-.lead .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
-.about { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--sunken); font-size: 13px; }
-.about b { font-weight: 600; }
-.about button { border: 0; background: none; cursor: pointer; color: var(--muted); padding: 2px; display: grid; }
-.fbox { border: 1px solid var(--field); border-radius: 10px; overflow: hidden; }
-.frow { display: grid; grid-template-columns: 1fr; }
-.frow.two { grid-template-columns: 1fr 1fr; }
-.frow + .frow { border-top: 1px solid var(--field); }
-.frow.two > .fc + .fc { border-left: 1px solid var(--field); }
-.fc { display: grid; padding: 7px 12px 6px; gap: 1px; position: relative; min-width: 0; }
-.fc:focus-within { box-shadow: inset 0 0 0 2px var(--ink); border-radius: 8px; }
-.fc label { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.fc input, .fc select { border: 0; outline: none; background: transparent; padding: 0; font-size: 14px; width: 100%; min-width: 0; height: 22px; }
-.fc select { appearance: none; cursor: pointer; }
-.fc.bad { background: var(--bad-soft); }
-.fc.bad label { color: var(--bad); }
-.ph { display: flex; gap: 6px; align-items: center; }
-.ph span { font-size: 14px; color: var(--muted); }
-.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: var(--muted); cursor: pointer; }
+.lead { flex: 1 1 340px; max-width: 400px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 24px; }
+.lead h2 { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; }
+.lead .sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.lead .about { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.lead .about b { color: var(--ink); font-weight: 600; }
+.lead form { display: flex; flex-direction: column; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input, .field select { height: 46px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; }
+.field input:focus, .field select:focus, .phone:focus-within { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.phone { display: flex; align-items: center; height: 46px; border: 1px solid var(--field); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.phone span { padding: 0 10px 0 12px; height: 100%; display: flex; align-items: center; border-right: 1px solid var(--line-soft); color: var(--muted); font-family: var(--mono); font-size: 14px; }
+.phone input { flex: 1; min-width: 0; height: 100%; border: 0; padding: 0 12px; background: transparent; font-size: 15px; outline: none; }
+.field.bad input, .field.bad select, .field.bad .phone { border-color: var(--bad); background: var(--bad-soft); }
+.field.bad label { color: var(--bad); }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: var(--muted); cursor: pointer; }
 .consent input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ink); flex: none; }
 .consent.bad { color: var(--bad); }
-.cta { height: 46px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 16px; color: var(--accent-ink); background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-.cta:hover { filter: brightness(1.05); }
-.ferr { font-size: 13px; color: var(--bad); font-weight: 500; }
-.fine { font-size: 12.5px; color: var(--muted); text-align: center; }
-.lead-done { display: grid; gap: 12px; justify-items: center; text-align: center; padding: 12px 4px; }
-.lead-done .tick { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--ok-soft); color: var(--ok); }
-.lead-done .tick svg.i { width: 28px; height: 28px; stroke-width: 2.4; }
-.proto { font-size: 12px; color: var(--muted); padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; }
-.trust { display: grid; gap: 14px; padding: 18px 6px 0; }
-.trust div { display: flex; gap: 14px; align-items: flex-start; font-size: 14px; }
-.trust b { display: block; font-weight: 600; }
-.trust span { color: var(--muted); font-size: 13px; }
+.ferr { font-size: 13px; color: var(--bad); font-weight: 600; }
+.lead .cta { min-height: 50px; font-size: 16px; }
+.lead-done { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
+.tick { width: 60px; height: 60px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; }
+.tick .ico { width: 28px; height: 28px; stroke-width: 2.6; }
+.lead-done h2 { font-size: 24px; }
+.lead-done p { color: var(--muted); max-width: 26em; }
+.lead-done p b { color: var(--ink); font-family: var(--mono); font-weight: 600; }
+.proto { font-size: 12px; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; padding: 6px 10px; }
 
-/* Result card */
-.rcard { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); overflow: hidden; }
-.rc-band { padding: 22px 24px; display: grid; gap: 12px; min-width: 0; }
-.rc-band + .rc-band { border-top: 1px solid var(--line-soft); }
-.rc-title { font-size: clamp(20px, 2vw, 24px); font-weight: 700; letter-spacing: -.02em; }
-.rc-detail { color: var(--muted); font-size: 15px; max-width: 44em; margin-top: -4px; }
-.rc-note { font-size: 13px; color: var(--muted); }
-.rc-label { font-size: 15px; font-weight: 700; }
-.rc-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
-.cal-key .k-on { border: 1px solid var(--ink); }
-.cal-key .k-gap { border: 1px dashed var(--field); }
-.evidence { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--muted); }
-.evidence svg.i { width: 18px; height: 18px; margin-top: 1px; }
-.evidence b { color: var(--ink); font-weight: 600; }
-.evidence a { color: var(--ink); text-decoration: underline; }
-.rc-foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; background: var(--sunken); gap: 16px; }
-.rc-next { font-size: 14px; }
-.rc-foot .btn-dark { height: 44px; }
-.result-area .fineprint { margin-top: 12px; font-size: 12.5px; }
-@media (max-width: 560px) { .rc-foot { grid-template-columns: 1fr; } .rc-band { padding: 18px; } }
-/* Result */
-.result-area { grid-area: result; padding-top: 24px; display: block; min-width: 0; }
-.r-block { padding-block: 22px; display: grid; gap: 16px; min-width: 0; }
-.r-block:first-child { padding-top: 0; }
-.r-block + .r-block { border-top: 1px solid var(--line-soft); }
-.status { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 6px 12px 6px 8px; border-radius: 999px; background: var(--tone-soft); color: var(--tone); font-weight: 700; font-size: 13px; }
-.status .dot { width: 22px; height: 22px; border-radius: 50%; background: var(--tone); color: var(--surface); display: grid; place-items: center; }
-.status .dot svg.i { width: 14px; height: 14px; stroke-width: 3; }
-.ex { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; margin-left: 4px; }
-.r-head h2 { font-size: clamp(20px, 2vw, 24px); font-weight: 700; margin-top: 10px; letter-spacing: -.02em; }
-.r-sum { font-size: 13.5px; font-weight: 600; color: var(--ink) !important; margin-top: 12px !important; }
-.r-sum span { font-weight: 400; color: var(--muted); }
-.r-head p { color: var(--muted); font-size: 15px; margin-top: 6px; max-width: 46em; }
+/* Browse */
+.browse { background: var(--surface); border-top: 1px solid var(--line); scroll-margin-top: 0; }
+.browse .wrap { padding-block: 56px 72px; display: flex; flex-direction: column; gap: 24px; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.sec-head h2 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: -.025em; }
+.sec-head p { color: var(--muted); margin-top: 6px; }
+.filters-btn { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.filters-btn:hover { border-color: var(--ink); }
+.filters-btn .n { min-width: 20px; height: 20px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; display: grid; place-items: center; padding: 0 6px; }
+.deg-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 20px; }
+.ucard { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+.ucard:hover { border-color: var(--ink); }
+.ucard-body { padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ucard-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.ucard-top .kicker { padding-top: 4px; }
+.save { width: 44px; height: 44px; margin: -10px -10px 0 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: var(--muted); flex: none; }
+.save .ico { width: 20px; height: 20px; stroke-width: 1.8; }
+.save[aria-pressed="true"] { color: var(--blue); }
+.save[aria-pressed="true"] .ico { fill: currentColor; }
+.ucard h3 { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; letter-spacing: -.015em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: var(--chip); }
+.chips span.more { background: none; color: var(--muted); }
+.ucard-meta { padding: 12px 18px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.ucard-meta span:first-child { color: var(--muted); }
+.ucard-meta .range { font-family: var(--mono); font-weight: 600; color: var(--ok); }
+.ucard-meta .range.old { color: var(--warn); }
+.ucard-link { min-height: 46px; padding: 0 18px; border: 0; border-top: 1px solid var(--line); background: var(--paper); display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 700; color: var(--blue); cursor: pointer; width: 100%; text-align: left; }
+.ucard-link:hover { background: var(--chip); }
+.more-row { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 8px; }
+.more-row p { font-size: 14px; color: var(--muted); }
+.empty { padding: 32px; border: 1px dashed var(--line); border-radius: 14px; text-align: center; color: var(--muted); }
+
+/* FAQ */
+.faq { border-top: 1px solid var(--line); }
+.faq .wrap { padding-block: 64px 72px; display: flex; flex-wrap: wrap; gap: 32px 64px; align-items: flex-start; }
+.faq-intro { flex: 1 1 280px; display: flex; flex-direction: column; gap: 10px; }
+.faq-intro h2 { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: -.025em; }
+.faq-intro p:last-child { color: var(--muted); }
+.faq-intro a { font-weight: 600; }
+.faq-list { flex: 999 1 560px; min-width: 0; border-top: 1px solid var(--ink); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { min-height: 64px; padding: 18px 0; cursor: pointer; font-weight: 600; font-size: 17px; display: flex; align-items: center; justify-content: space-between; gap: 16px; list-style: none; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; flex: none; font-family: var(--mono); font-size: 20px; color: var(--muted); }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { margin: 0 0 20px; color: var(--muted); max-width: 44em; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 28px 40px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--muted); }
+footer p { max-width: 62em; }
+
+/* Dialogs */
+dialog { border: 0; padding: 0; background: var(--surface); color: var(--ink); border-radius: 18px; box-shadow: 0 24px 60px rgba(19, 22, 28, .35); max-height: calc(100vh - 64px); overflow: auto; }
+dialog::backdrop { background: var(--scrim); }
+.d-bar { position: sticky; top: 0; z-index: 2; height: 60px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--line-soft); background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.d-bar .acts { display: flex; align-items: center; gap: 4px; }
+.again { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.again .ico { width: 16px; height: 16px; }
+
+/* Result dialog */
+#d-result { width: min(820px, calc(100vw - 32px)); }
+.r-head { padding: 28px; display: flex; gap: 24px; align-items: center; }
+.r-head .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.status { align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: var(--tone-soft); color: var(--tone); font-size: 13px; font-weight: 700; }
+.r-head h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.15; letter-spacing: -.02em; }
+.r-head p { color: var(--muted); }
+.r-head .note { font-size: 13px; }
 .tone-ok { --tone: var(--ok); --tone-soft: var(--ok-soft); }
 .tone-warn { --tone: var(--warn); --tone-soft: var(--warn-soft); }
 .tone-bad { --tone: var(--bad); --tone-soft: var(--bad-soft); }
 .tone-na { --tone: var(--na); --tone-soft: var(--na-soft); }
-.r-title { font-size: 20px; font-weight: 700; }
-.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; }
-.fact { display: flex; gap: 16px; align-items: flex-start; min-width: 0; }
-.fact svg.i { width: 26px; height: 26px; margin-top: 2px; stroke-width: 1.5; }
-.fact b { display: block; font-weight: 600; font-size: 15px; overflow-wrap: anywhere; }
-.fact span { color: var(--muted); font-size: 14px; }
+.seal { flex: none; }
+.ctx { padding: 20px 28px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--line-soft); background: var(--paper); }
+.ctx .box { width: 44px; height: 44px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+.ctx .box .ico { width: 22px; height: 22px; stroke-width: 1.8; }
+.ctx b { display: block; font-weight: 700; font-size: 17px; }
+.ctx span { font-size: 13.5px; color: var(--muted); }
+.ask-year { padding: 28px 28px 8px; display: flex; flex-direction: column; gap: 6px; }
+.ask-year h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.15; letter-spacing: -.02em; }
+.ask-year p { color: var(--muted); }
+.facts { margin: 0; padding: 20px 28px; border-top: 1px solid var(--line-soft); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 24px; }
+.facts div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.facts dd.sub { font-size: 13px; color: var(--muted); font-weight: 400; }
+.strip-sec { padding: 22px 28px 24px; border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 14px; }
+.strip-sec h3 { font-size: 15px; font-weight: 700; }
+.row-between { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
+.key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
+.key span { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.key .k-on { background: var(--ok); }
+.key .k-you { box-shadow: 0 0 0 2px var(--ink); }
+.strip { list-style: none; margin: 0; padding: 4px; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; font-family: var(--mono); }
+.cell { width: 100%; height: 58px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; padding: 0; }
+.cell b { font-size: 13px; font-weight: 600; }
+.cell small { font-family: var(--body); font-size: 11px; }
+.cell.on { background: var(--ok); color: #fff; }
+.cell.off { background: var(--surface); border: 1px dashed var(--dash); color: var(--muted); }
+.cell.you { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.cell.you small { font-weight: 700; }
+.cell.off.you { border: 2px solid var(--bad); background: var(--bad-soft); color: var(--bad); }
+button.cell { cursor: pointer; height: 62px; }
+button.cell b { font-size: 14px; }
+button.cell:hover { filter: brightness(1.08); }
+.evidence { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--muted); }
+.evidence .ico { margin-top: 1px; stroke-width: 1.8; }
+.evidence b { color: var(--ink); font-weight: 600; }
+.cands { padding: 18px 28px 20px; border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 6px; }
+.cands h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.cand { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); cursor: pointer; text-align: left; }
+.cand:hover { border-color: var(--ink); }
+.cand b { display: block; font-weight: 600; }
+.cand small { display: block; font-size: 13px; color: var(--muted); }
+.r-foot { padding: 20px 28px; background: var(--paper); border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 14px; }
+.r-foot .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 20px; }
+.r-foot .row > p { flex: 1 1 260px; font-size: 14px; }
+.r-foot .btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.copied { font-size: 13px; font-weight: 600; color: var(--ok); }
+.verify { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); text-decoration: none; }
+.verify:hover { border-color: var(--ink); color: var(--ink); }
+.verify .ico { stroke-width: 1.8; }
+.verify .t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.verify .t b { font-size: 14px; font-weight: 600; }
+.verify .t small { font-size: 12.5px; color: var(--muted); }
+.disclaim { font-size: 12.5px; color: var(--muted); }
 
-.cal { display: grid; grid-template-columns: repeat(var(--n), minmax(64px, 1fr)); gap: 4px; }
-.cal-scroll { overflow-x: auto; padding-bottom: 4px; }
-.day { display: grid; justify-items: center; gap: 6px; padding: 6px 0; }
-.day .c { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; border: 1px solid transparent; }
-.day small { font-size: 11px; color: var(--muted); }
-.day.on .c { color: var(--ink); border-color: var(--ink); }
-.day.off .c { color: var(--muted); text-decoration: line-through; opacity: .55; }
-.day.gap .c { color: var(--muted); border: 1px dashed var(--line); }
-.day.q.on .c { background: var(--ink); color: var(--bg); }
-.day.q.off .c, .day.q.gap .c { background: var(--bad-soft); color: var(--bad); border: 2px solid var(--bad); opacity: 1; }
-.cal-key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
-.cal-key i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 6px; }
-.odl-note { font-size: 14px; color: var(--muted); }
+/* University page (full-screen dialog) */
+#d-uni { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; border-radius: 0; background: var(--paper); }
+#d-uni .top { position: sticky; top: 0; z-index: 3; }
+.u-hero .wrap { padding-block: 28px 40px; display: flex; flex-direction: column; gap: 20px; }
+.back { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; border: 0; background: none; cursor: pointer; padding: 0; }
+.u-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 32px; }
+.u-title { flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.u-title h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 4.4vw, 56px); line-height: 1.02; letter-spacing: -.035em; }
+.u-stats { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+.u-stats span { color: var(--muted); }
+.u-stats b { color: var(--ink); font-weight: 700; }
+.u-acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.u-acts .btn { min-height: 48px; }
+.u-acts .btn[aria-pressed="true"] .ico { fill: currentColor; }
+.u-progs { background: var(--surface); border-top: 1px solid var(--line); }
+.u-progs .wrap { padding-block: 36px 72px; display: flex; flex-direction: column; gap: 20px; }
+.u-progs h2 { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: -.02em; }
+.pgrid { display: grid; grid-template-columns: minmax(0, 1fr) auto 150px 210px; column-gap: 24px; align-items: center; }
+.pg-head { padding: 18px 0 10px; border-bottom: 1px solid var(--ink); }
+.pg-head h3 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.ycols { display: grid; grid-template-columns: repeat(var(--n), 38px); gap: 4px; }
+.pg-head .ycols span { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-align: center; }
+.prow { padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+.prow .nm b { display: block; font-weight: 600; font-size: 16px; }
+.prow .nm small { font-size: 12.5px; color: var(--muted); }
+.ycols .c { height: 28px; border-radius: 6px; }
+.ycols .c.on { background: var(--ok); }
+.ycols .c.off { border: 1px dashed #D6D2C7; }
+.badge { justify-self: start; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+.badge.cur { background: var(--ok-soft); color: var(--ok); }
+.badge.old { background: var(--warn-soft); color: var(--warn); }
+.prow .chk { min-height: 44px; border: 1px solid var(--ink); border-radius: 9px; font-size: 14px; font-weight: 600; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.prow .chk:hover { background: var(--paper); }
+.prow .chk .ico { width: 14px; height: 14px; stroke-width: 2.2; }
+.u-note { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
 
-.entries { display: grid; gap: 0; }
-.entry { display: flex; gap: 16px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line-soft); }
-.entry:first-child { border-top: 0; padding-top: 0; }
-.entry b { display: block; font-weight: 500; font-size: 14.5px; overflow-wrap: anywhere; }
-.entry span { color: var(--muted); font-size: 13px; }
-.entry .ibox { width: 44px; height: 44px; }
-.next { font-size: 15px; max-width: 46em; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.btn-dark { height: 48px; padding: 0 22px; border-radius: 8px; border: 0; background: var(--ink); color: var(--bg); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-.btn-line { height: 48px; padding: 0 20px; border-radius: 8px; border: 1px solid var(--ink); background: var(--surface); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-.btn-dark:hover { filter: brightness(1.15); }
-.btn-line:hover { background: var(--sunken); }
-.copied { font-size: 14px; color: var(--ok); font-weight: 600; }
-.fineprint { font-size: 13px; color: var(--muted); }
-.fineprint a { text-decoration: underline; }
-.cands { display: grid; gap: 4px; }
-
-/* Browse */
-.browse { border-top: 1px solid var(--line-soft); }
-.browse .wrap { padding-block: 40px 72px; display: grid; gap: 20px; }
-.b-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
-.b-head h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
-.b-head p { color: var(--muted); margin-top: 4px; }
-.catbar { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--line-soft); position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); background: var(--bg); z-index: 20; padding-top: 8px; }
-.cats { display: flex; gap: 32px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
-.cats::-webkit-scrollbar { display: none; }
-.cat { display: grid; justify-items: center; gap: 8px; padding: 6px 0 12px; border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; border-bottom: 2px solid transparent; }
-.cat svg.i { width: 24px; height: 24px; stroke-width: 1.5; }
-.cat:hover { color: var(--ink); border-bottom-color: var(--line); }
-.cat[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
-.b-tools { display: flex; gap: 10px; align-items: center; padding-bottom: 12px; }
-.b-search { height: 46px; width: 220px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); padding: 0 14px; font-size: 14px; }
-.b-search:focus { outline: none; border-color: var(--ink); }
-.filters-btn { height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); display: inline-flex; gap: 8px; align-items: center; font-weight: 600; font-size: 13px; cursor: pointer; }
-.filters-btn:hover { border-color: var(--ink); }
-.filters-btn .n { min-width: 20px; height: 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 11px; display: grid; place-items: center; padding: 0 5px; }
-.b-count { font-size: 14px; color: var(--muted); }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 40px 24px; }
-.card { display: grid; gap: 12px; cursor: pointer; border: 0; background: none; padding: 0; text-align: left; }
-.art { position: relative; aspect-ratio: 20 / 19; max-width: 100%; border-radius: 12px; overflow: hidden; background: var(--a1); }
-.art::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 78% 22%, var(--a2) 0 28%, transparent 29%), radial-gradient(circle at 18% 110%, var(--a3) 0 42%, transparent 43%), linear-gradient(160deg, transparent 55%, rgba(0, 0, 0, .12)); }
-.art .ini { position: absolute; left: 18px; bottom: 12px; font-size: 64px; font-weight: 800; letter-spacing: -.05em; color: #fff; line-height: 1; text-shadow: 0 2px 12px rgba(0, 0, 0, .15); }
-.badge { position: absolute; top: 14px; left: 14px; background: #fff; color: #222; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0, 0, 0, .15); }
-.heart { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: #fff; }
-.heart svg.i { width: 26px; height: 26px; stroke-width: 2; fill: rgba(0, 0, 0, .45); }
-.heart[aria-pressed="true"] svg.i { fill: var(--accent); stroke: #fff; }
-.card .t { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; font-size: 15px; }
-.card .t span:first-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.card .t span:last-child { flex: none; font-weight: 500; font-size: 14px; font-variant-numeric: tabular-nums; }
-.card .meta { display: grid; gap: 2px; font-size: 14px; color: var(--muted); margin-top: -8px; }
-.card .meta b { color: var(--ink); font-weight: 600; }
-.more-row { display: grid; justify-items: center; gap: 12px; }
-.more-row p { font-weight: 600; }
-
-/* Dialogs */
-dialog { border: 0; padding: 0; border-radius: 16px; width: min(780px, calc(100vw - 32px)); max-height: calc(100vh - 48px); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg); }
-dialog::backdrop { background: rgba(0, 0, 0, .5); }
-.d-top { position: sticky; top: 0; z-index: 3; display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--line-soft); background: var(--surface); }
-.d-top h2 { text-align: center; font-size: 16px; font-weight: 700; }
-.xbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
-.xbtn:hover { background: var(--sunken); }
-.d-body { padding: 24px; display: grid; gap: 28px; }
-.d-sec { display: grid; gap: 14px; }
-.d-sec + .d-sec { border-top: 1px solid var(--line-soft); padding-top: 28px; }
-.d-sec h3 { font-size: 20px; font-weight: 700; }
-.d-foot { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid var(--line-soft); background: var(--surface); }
-.linkbtn { border: 0; background: none; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 8px 0; }
-.sel { height: 52px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); width: 100%; }
-.d-hero { position: relative; aspect-ratio: auto; height: 200px; border-radius: 12px; }
-.d-name { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
-.d-meta { color: var(--muted); margin-top: 4px; }
-.prow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line-soft); }
-.prow:first-of-type { border-top: 0; }
-.prow .pn { font-size: 14.5px; font-weight: 500; overflow-wrap: anywhere; }
-.mini { display: flex; gap: 4px; }
-.mini span { width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 700; display: grid; place-items: center; color: var(--muted); text-decoration: line-through; opacity: .5; }
-.mini span.on { color: var(--ink); border: 1px solid var(--ink); text-decoration: none; opacity: 1; }
-.prow button { height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--ink); background: var(--surface); font-weight: 600; font-size: 13px; cursor: pointer; }
-.prow button:hover { background: var(--sunken); }
-.pg-title { font-size: 13px; font-weight: 700; color: var(--muted); padding-top: 8px; }
-
-footer { border-top: 1px solid var(--line-soft); background: var(--sunken); }
-footer .wrap { padding-block: 28px 36px; display: grid; gap: 8px; font-size: 13px; color: var(--muted); }
-footer a { text-decoration: underline; }
+/* Filters dialog */
+#d-filters { width: min(720px, calc(100vw - 32px)); padding: 0; display: none; flex-direction: column; overflow: hidden; height: min(904px, calc(100vh - 64px)); }
+#d-filters[open] { display: flex; }
+#d-filters .d-bar { display: grid; grid-template-columns: 44px 1fr 44px; padding: 0 12px; height: 64px; flex: none; position: static; }
+#d-filters .d-bar h2 { text-align: center; font-size: 16px; font-weight: 700; }
+.f-body { flex: 1; overflow: auto; padding: 4px 28px 24px; display: flex; flex-direction: column; }
+.f-sec { padding: 22px 0; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.f-sec + .f-sec { border-top: 1px solid var(--line-soft); }
+.f-sec h3 { font-family: var(--display); font-weight: 700; font-size: 20px; }
+.f-sec .desc { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.f-search { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; border: 1px solid var(--field); border-radius: 8px; background: var(--surface); }
+.f-search:focus-within { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.f-search input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 15px; outline: none; }
+.f-sugg { border: 1px solid var(--line); border-radius: 10px; padding: 6px; display: flex; flex-direction: column; }
+.tag { min-height: 36px; padding: 0 6px 0 14px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.tag button { width: 28px; height: 28px; border: 0; background: none; color: #fff; cursor: pointer; display: grid; place-items: center; }
+.tag .ico { width: 12px; height: 12px; stroke-width: 2.6; }
+.f-years { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.f-sel { height: 52px; border: 1px solid var(--field); border-radius: 8px; padding: 0 12px; background: var(--surface); font-size: 15px; }
+.f-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; }
+.f-toggle input { width: 22px; height: 22px; margin: 0; accent-color: var(--ink); flex: none; }
+.f-foot { flex: none; padding: 16px 28px; border-top: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--surface); }
+.f-foot .btn { min-height: 50px; padding: 0 24px; }
 
 /* Responsive */
-@media (max-width: 1080px) {
-  .wrap { padding-inline: 24px; }
-  .hero { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 40px; }
-  #p-prog { left: 0; }
+@media (max-width: 900px) {
+  .sbox { grid-template-columns: 1fr; }
+  .seg { border-right: 0; border-bottom: 1px solid var(--line); }
+  .seg:first-child { border-radius: 13px 13px 0 0; }
+  .panel { position: static; width: auto !important; box-shadow: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; max-height: none; padding: 12px 18px 18px; }
+  .sbox > .seg[data-seg="uni"] { order: 1; } #p-uni { order: 2; }
+  .sbox > .seg[data-seg="prog"] { order: 3; } #p-prog { order: 4; }
+  .sbox > .seg[data-seg="year"] { order: 5; } #p-year { order: 6; }
+  .go-wrap { order: 7; }
+  .go { flex: 1; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pgrid { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; }
+  .pg-head .ycols { display: none; }
+  .prow .ycols { grid-column: 1 / -1; order: 3; }
+  .prow .badge { justify-self: end; }
+  .prow .chk { grid-column: 1 / -1; order: 4; }
 }
-@media (max-width: 860px) {
-  .top .wrap { height: 60px; }
-  .nav { display: none; }
-  .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "left" "lead" "result"; padding-block: 16px 28px; }
-  .lead-col { position: static; padding-top: 16px; }
-  .trust { display: none; }
-  .result-area { padding-top: 32px; }
-  .catbar { top: calc(env(safe-area-inset-top, 0px) + 60px); flex-wrap: wrap; gap: 8px 16px; }
-  .b-tools { width: 100%; }
-  .b-search { flex: 1; width: auto; }
-
-  .sbar { flex-direction: column; align-items: stretch; border-radius: 20px; padding: 8px; gap: 4px; }
-  .sbar.active { background: var(--surface); border-color: var(--line); }
-  .divider { display: none; }
-  .seg, .seg:first-child { padding: 12px 16px; border-radius: 14px; }
-  .seg.on, .sbar.active .seg.on:hover { box-shadow: none; background: var(--sunken); }
-  .panel { position: static; width: auto !important; box-shadow: none; border-radius: 14px; padding: 8px 8px 16px; max-height: none; }
-  #p-uni { order: 2; } .seg[data-seg="uni"] { order: 1; }
-  .seg[data-seg="prog"] { order: 3; } #p-prog { order: 4; }
-  .seg[data-seg="year"] { order: 5; } #p-year { order: 6; }
-  .go { order: 7; margin: 6px 0 0; height: 50px; border-radius: 12px; }
-  .go .t, .sbar.active .go .t { display: inline; }
-  .field-hint { margin-left: 16px; }
-}
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
-  .top-right .pill-btn span { display: none; }
-  .facts { grid-template-columns: 1fr; }
-  .frow.two { grid-template-columns: 1fr; }
-  .frow.two > .fc + .fc { border-left: 0; border-top: 1px solid var(--field); }
-  .grid { grid-template-columns: 1fr; }
-  .prow { grid-template-columns: minmax(0, 1fr) auto; }
-  .prow .mini { grid-column: 1 / -1; order: 3; }
-  .day .c { width: 48px; height: 48px; }
-  .cal { grid-template-columns: repeat(var(--n), minmax(52px, 1fr)); }
+  .top .wrap { height: 60px; }
+  .stamp { display: none; }
+  .hero .wrap { padding-block: 32px 40px; gap: 32px; }
+  .hero-copy > p:last-child { font-size: 15.5px; }
+  .lead { max-width: none; }
+  .sec-head h2, .faq-intro h2 { font-size: 26px; }
+  .browse .wrap { padding-block: 40px 56px; }
+  /* result becomes a bottom sheet */
+  #d-result { width: 100vw; max-width: 100vw; margin: auto 0 0; max-height: calc(100vh - 40px); border-radius: 20px 20px 0 0; }
+  .r-head { padding: 20px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .r-head h2, .ask-year h2 { font-size: 25px; }
+  .seal { width: 88px; height: 88px; }
+  .ctx, .facts, .strip-sec, .cands, .r-foot { padding-inline: 16px; }
+  .ask-year { padding-inline: 16px; }
+  .strip { gap: 4px; }
+  .cell { height: 44px; border-radius: 6px; }
+  .cell small { display: none; }
+  .cell b { font-size: 10.5px; }
+  button.cell { height: 48px; }
+  .r-foot { padding-bottom: 96px; }
+  .r-foot .btns { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgba(19, 22, 28, .08); }
+  .r-foot .btns .btn-ink { flex: 1; min-height: 50px; }
+  .r-foot .btns .share-t { display: none; }
+  .r-foot .btns .btn-line { width: 50px; padding: 0; min-height: 50px; }
+  .d-bar { padding-left: 16px; }
+  .again .t-long { display: none; }
+  #d-filters { width: 100vw; max-width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; }
+  .f-body, .f-foot { padding-inline: 16px; }
+  .f-years { grid-template-columns: repeat(3, 1fr); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .result-area.flash { animation: rise .35s ease-out; }
-  @keyframes rise { from { transform: translateY(8px); opacity: .5; } to { transform: none; opacity: 1; } }
-  .card:hover .art::before { transform: scale(1.04); }
-  .art::before { transition: transform .4s ease; }
+  dialog[open] { animation: pop .18s ease-out; }
+  @keyframes pop { from { transform: translateY(10px); opacity: .6; } to { transform: none; opacity: 1; } }
 }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
-    <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-5h6v5M9 11h.01M15 11h.01"/></symbol>
-    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9.5 12 5l10 4.5L12 14 2 9.5Z"/><path d="M6 11.5V16c3.5 2.3 8.5 2.3 12 0v-4.5M22 9.5V15"/></symbol>
-    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></symbol>
-    <symbol id="i-online" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 20h20M9.5 10.5l2 2 3.5-3.5"/></symbol>
-    <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3" y="7.5" width="18" height="12.5" rx="2"/><path d="M8.5 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2M3 13h18"/></symbol>
-    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 20v-6M11 20V8M16 20v-9M20 6l-5 3-4-3-5 4"/></symbol>
-    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></symbol>
-    <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 19h18l-2-4H5l-2 4Z"/></symbol>
-    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7h7v3h-7zM9 14h.01M12 14h.01M15 14h.01M9 17.5h.01M12 17.5h.01M15 17.5h.01"/></symbol>
-    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5ZM12 6.5v13"/></symbol>
-    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L5 18a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8.5V3M7.5 15h9"/></symbol>
-    <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 5.2a3 3 0 0 1 0 5.6M21 20c0-2.6-1.6-4.6-4-5.3"/></symbol>
-    <symbol id="i-cert" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h10M7 11h6M15 14.5l-1 6 2.5-1.5 2.5 1.5-1-6"/></symbol>
-    <symbol id="i-library" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5M4 20h16M6 10v8M10 10v8M14 10v8M18 10v8"/></symbol>
-    <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M8 4h10a2 2 0 0 1 0 4H8M8 4a2 2 0 1 0 0 4M8 8v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8M11 12h6M11 15.5h4"/></symbol>
-    <symbol id="i-ban" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.8 3.4 8 8 9 4.6-1 8-4.2 8-9V6l-8-3Z"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6a4.5 4.5 0 0 1 8 2.9c0 6.1-8 11-8 11Z"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
-    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 7.5v6M12 17h.01"/></symbol>
-    <symbol id="i-help" viewBox="0 0 24 24"><path d="M9.3 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.3-1.2 1-1.2 1.8v.4M12 17h.01"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></symbol>
     <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4"/></symbol>
-    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9.5 12 5l10 4.5L12 14 2 9.5Z"/><path d="M6 11.5V16c3.5 2.3 8.5 2.3 12 0v-4.5"/></symbol>
     <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.8 3.4 8 8 9 4.6-1 8-4.2 8-9V6l-8-3Z"/><path d="m8.8 12.2 2.3 2.3 4.3-4.6"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9 12 4l9 5M4 20h16M6 10v8M10 10v8M14 10v8M18 10v8"/></symbol>
+    <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></symbol>
     <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M6 12h12M12 6v12"/></symbol>
   </defs>
@@ -396,121 +417,100 @@ footer a { text-decoration: underline; }
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="DegreeCheck home">
-      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 4.5 7.3v7.9c0 7.2 4.9 12.9 11.5 14.3 6.6-1.4 11.5-7.1 11.5-14.3V7.3L16 2.5Z" fill="currentColor"/><path d="m10.8 16 3.6 3.6 7-7.3" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      degreecheck
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 4.5 7.3v7.9c0 7.2 4.9 12.9 11.5 14.3 6.6-1.4 11.5-7.1 11.5-14.3V7.3L16 2.5Z" fill="#2B3BD1"/><path d="m10.8 16 3.6 3.6 7-7.3" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>degreecheck</span>
     </a>
-    <a class="top-link" href="#browse">Browse universities</a>
+    <span class="stamp" id="stamp">UGC-DEB data</span>
   </div>
 </header>
 
-<main id="top">
-  <div class="wrap hero">
-    <div class="fold-left">
-    <div class="intro">
-      <h1>Is your online degree UGC-approved?</h1>
-      <p id="intro-sub">Check any online programme against UGC-DEB approvals for your admission year.</p>
-    </div>
-
-    <form class="search-area" id="sform" novalidate autocomplete="off" role="search" aria-label="Check an online degree">
-      <div class="sbar" id="sbar">
-        <div class="seg" data-seg="uni">
-          <label for="q-uni">University</label>
-          <input id="q-uni" placeholder="Search online universities" spellcheck="false" role="combobox" aria-controls="p-uni" aria-expanded="false" aria-autocomplete="list">
+<main>
+  <section class="hero ruled" id="top">
+    <div class="wrap">
+      <div class="hero-main">
+        <div class="hero-copy">
+          <p class="eyebrow">Checked against UGC-DEB's official list</p>
+          <h1>Is your online degree UGC-approved?</h1>
+          <p>Pick the university, programme and the year you were admitted. Approval follows the admission year, not the year you passed.</p>
         </div>
-        <span class="divider" aria-hidden="true"></span>
-        <button type="button" class="seg" data-seg="prog" aria-controls="p-prog" aria-expanded="false"><span class="lab">Programme</span><span class="val" id="v-prog">Add degree</span></button>
-        <span class="divider" aria-hidden="true"></span>
-        <button type="button" class="seg" data-seg="year" aria-controls="p-year" aria-expanded="false"><span class="lab">Admission year</span><span class="val" id="v-year">Add year</span></button>
-        <button type="submit" class="go" aria-label="Check approval"><svg class="i"><use href="#i-search"/></svg><span class="t">Check</span></button>
 
-        <div class="panel" id="p-uni" role="listbox" aria-label="Universities" hidden></div>
-        <div class="panel" id="p-prog" hidden></div>
-        <div class="panel" id="p-year" hidden>
-          <p class="p-sub">Year of admission</p>
-          <div class="years" id="years"></div>
-          <div class="stepper">
-            <div class="q">Only know the passing year?<small>We'll work out admission from course length</small></div>
-            <div class="step">
-              <button type="button" id="py-minus" aria-label="Earlier passing year"><svg class="i" style="width:14px;height:14px"><use href="#i-minus"/></svg></button>
-              <span id="py" aria-live="polite">2025</span>
-              <button type="button" id="py-plus" aria-label="Later passing year"><svg class="i" style="width:14px;height:14px"><use href="#i-plus"/></svg></button>
-            </div>
+        <form class="sform" id="sform" role="search" aria-label="Check an online degree" novalidate autocomplete="off">
+          <div class="sbox" id="sbox">
+            <label class="seg" data-seg="uni">
+              <span class="lbl">University</span>
+              <input id="q-uni" placeholder="Search online universities" spellcheck="false" role="combobox" aria-controls="p-uni" aria-expanded="false" aria-autocomplete="list">
+            </label>
+            <button type="button" class="seg" data-seg="prog" aria-controls="p-prog" aria-expanded="false"><span class="lbl">Programme</span><span class="val" id="v-prog">Add degree</span></button>
+            <button type="button" class="seg" data-seg="year" aria-controls="p-year" aria-expanded="false"><span class="lbl">Admission year</span><span class="val" id="v-year">Add year</span></button>
+            <div class="go-wrap"><button type="submit" class="btn btn-blue go"><svg class="ico" style="stroke-width:2.6"><use href="#i-search"/></svg>Check approval</button></div>
+            <div class="panel" id="p-uni" role="listbox" aria-label="Universities" hidden></div>
+            <div class="panel" id="p-prog" hidden></div>
+            <div class="panel" id="p-year" hidden></div>
           </div>
-          <p class="step-note" id="py-note"></p>
+          <p class="s-hint" id="s-hint" hidden></p>
+        </form>
+
+        <div class="popular">
+          <span class="kicker">Popular checks</span>
+          <div class="pills" id="popular"></div>
         </div>
       </div>
-      <p class="field-hint" id="s-hint" hidden></p>
-    </form>
-    <p class="try" id="try" hidden>Example: <button type="button" id="try-btn"></button></p>
-    </div>
 
-    <div class="lead-col" id="lead">
-      <div class="lead">
+      <aside class="lead" id="lead" aria-labelledby="lead-title">
+        <div>
+          <h2 id="lead-title">Free advice on online degrees</h2>
+          <p class="sub">One call from a counsellor. No spam.</p>
+          <p class="about" id="lead-about" hidden></p>
+        </div>
         <form id="lead-form" novalidate>
-          <div style="display:grid;gap:12px">
-            <div>
-              <h2>Free advice on online degrees</h2>
-              <p class="sub">One call from a counsellor. No spam.</p>
-            </div>
-            <div class="about" id="lead-about" hidden></div>
-            <div class="fbox">
-              <div class="frow two">
-                <div class="fc" id="fc-name"><label for="l-name">Name</label><input id="l-name" autocomplete="name" placeholder="Full name"></div>
-                <div class="fc" id="fc-phone"><label for="l-phone">Mobile</label><div class="ph"><span>+91</span><input id="l-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10 digits"></div></div>
-              </div>
-              <div class="frow"><div class="fc" id="fc-course"><label for="l-course">Course you're interested in</label><select id="l-course"></select></div></div>
-            </div>
-            <label class="consent" id="consent-wrap"><input type="checkbox" id="l-consent"> I agree to be contacted by call, SMS or WhatsApp.</label>
-            <p class="ferr" id="lead-err" hidden></p>
-            <button class="cta" type="submit">Get free guidance</button>
-          </div>
+          <div class="field" id="f-name"><label for="l-name">Name</label><input id="l-name" autocomplete="name" placeholder="Full name"></div>
+          <div class="field" id="f-phone"><label for="l-phone">Mobile</label><div class="phone"><span>+91</span><input id="l-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit number"></div></div>
+          <div class="field" id="f-course"><label for="l-course">Course you're interested in</label><select id="l-course"></select></div>
+          <label class="consent" id="consent"><input type="checkbox" id="l-consent"> I agree to be contacted by call, SMS or WhatsApp.</label>
+          <p class="ferr" id="lead-err" hidden></p>
+          <button type="submit" class="btn btn-blue cta">Get free guidance</button>
         </form>
         <div class="lead-done" id="lead-done" hidden></div>
-      </div>
+      </aside>
     </div>
-
-    <div class="result-area" id="result" aria-live="polite" hidden></div>
-  </div>
+  </section>
 
   <section class="browse" id="browse">
     <div class="wrap">
-      <div class="b-head">
+      <div class="sec-head">
         <div>
-          <h2>Online universities approved by UGC</h2>
+          <h2>Universities approved to teach online</h2>
+          <p id="browse-sub"></p>
         </div>
+        <button type="button" class="filters-btn" id="open-filters"><svg class="ico" style="stroke-width:1.8"><use href="#i-sliders"/></svg>Filters<span class="n" id="f-count" hidden></span></button>
       </div>
-      <div class="catbar">
-        <div class="cats" id="cats" role="group" aria-label="Filter by degree"></div>
-        <div class="b-tools">
-          <button type="button" class="filters-btn" id="open-filters"><svg class="i"><use href="#i-sliders"/></svg>Filters<span class="n" id="f-count" hidden></span></button>
-        </div>
-      </div>
-      <p class="b-count" id="b-count"></p>
+      <div class="deg-row" id="deg-row" role="group" aria-label="Filter by degree"></div>
       <div class="grid" id="grid"></div>
-      <div class="more-row" id="more-row" hidden>
-        <p>Continue exploring online universities</p>
-        <button type="button" class="btn-dark" id="b-more">Show more</button>
+      <div class="more-row" id="more-row">
+        <p id="showing"></p>
+        <button type="button" class="btn btn-line" id="b-more">Show more universities</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="wrap">
+      <div class="faq-intro">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions about online degree approval</h2>
+        <p>Still unsure? <a href="#lead" id="faq-lead">Ask a counsellor for free</a></p>
+      </div>
+      <div class="faq-list">
+        <details open><summary>What does UGC-DEB approval mean?</summary><p>UGC-DEB decides, year by year, which universities may offer which programmes online. An online degree is recognised only if the programme was on that approved list.</p></details>
+        <details><summary>Why do you ask for the admission year, not the passing year?</summary><p>Approval is granted for each academic year of admission. What matters is whether the programme was approved for the year you joined, even if you graduated later.</p></details>
+        <details><summary>My specialisation isn't listed. Is my degree invalid?</summary><p>Not necessarily. Some approvals cover a degree, such as an MBA, without naming specialisations. Ask the university for its UGC-DEB entitlement letter, which lists the approved specialisations.</p></details>
+        <details><summary>Can I do B.Tech, MBBS or law online?</summary><p>No. Professional degrees such as engineering, medicine, law, pharmacy, nursing and architecture are outside UGC's online scheme, so no university is approved to offer them online.</p></details>
+        <details><summary>Does this confirm my certificate is genuine?</summary><p>No. DegreeCheck confirms the programme was approved for your admission year. To verify a specific certificate, use DigiLocker or the university's own verification service.</p></details>
+        <details><summary>Where does this data come from?</summary><p id="faq-src">From UGC-DEB's official programme list at <a href="https://deb.ugc.ac.in/Home/HEI_Prog_List" target="_blank" rel="noopener">deb.ugc.ac.in</a>.</p></details>
       </div>
     </div>
   </section>
 </main>
-
-<dialog id="d-uni" aria-labelledby="du-title">
-  <div class="d-top"><button type="button" class="xbtn" data-close aria-label="Close"><svg class="i" style="width:16px;height:16px"><use href="#i-x"/></svg></button><h2 id="du-title">University details</h2><span></span></div>
-  <div class="d-body" id="du-body"></div>
-</dialog>
-
-<dialog id="d-filters" aria-labelledby="df-title">
-  <div class="d-top"><button type="button" class="xbtn" data-close aria-label="Close"><svg class="i" style="width:16px;height:16px"><use href="#i-x"/></svg></button><h2 id="df-title">Filters</h2><span></span></div>
-  <div class="d-body">
-    <div class="d-sec"><h3>Degree</h3><div class="pills" id="f-degs"></div></div>
-    <div class="d-sec"><h3>Approved for admission in</h3><div class="pills" id="f-years"></div></div>
-    <div class="d-sec"><h3>Type of university</h3><div class="pills" id="f-types"></div></div>
-    <div class="d-sec"><h3><label for="f-state">State</label></h3><select class="sel" id="f-state"><option value="">All states</option></select></div>
-    <div class="d-sec"><h3>Saved</h3><div class="pills"><button type="button" class="pill" id="f-saved" aria-pressed="false">Only saved universities</button></div></div>
-  </div>
-  <div class="d-foot"><button type="button" class="linkbtn" id="f-clear">Clear all</button><button type="button" class="btn-dark" id="f-apply">Show universities</button></div>
-</dialog>
 
 <footer>
   <div class="wrap">
@@ -518,6 +518,31 @@ footer a { text-decoration: underline; }
     <p id="foot-src"></p>
   </div>
 </footer>
+
+<dialog id="d-result" aria-labelledby="r-title"></dialog>
+<dialog id="d-uni" aria-label="University programmes"></dialog>
+<dialog id="d-filters" aria-labelledby="df-title">
+  <div class="d-bar"><button type="button" class="xbtn" data-close aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button><h2 id="df-title">Filters</h2><span></span></div>
+  <div class="f-body">
+    <div class="f-sec">
+      <h3><label for="f-uni">University</label></h3>
+      <div class="f-search"><svg class="ico" style="color:var(--muted)"><use href="#i-search"/></svg><input id="f-uni" placeholder="Search universities" autocomplete="off"></div>
+      <div class="f-sugg" id="f-sugg" hidden></div>
+      <div class="pills" id="f-tags"></div>
+    </div>
+    <div class="f-sec"><h3>Degree</h3><div class="pills" id="f-degs"></div></div>
+    <div class="f-sec">
+      <div><h3>Approved for admission in</h3><p class="desc">Show universities approved to teach online in that academic year</p></div>
+      <div class="f-years" id="f-years"></div>
+    </div>
+    <div class="f-sec"><h3>Type of university</h3><div class="pills" id="f-types"></div></div>
+    <div class="f-sec"><h3><label for="f-state">State</label></h3><select class="f-sel" id="f-state"><option value="">All states</option></select></div>
+    <div class="f-sec">
+      <label class="f-toggle"><span><h3>Saved only</h3><span class="desc">Show only universities you've bookmarked</span></span><input type="checkbox" id="f-saved"></label>
+    </div>
+  </div>
+  <div class="f-foot"><button type="button" class="linkbtn" id="f-clear">Clear all</button><button type="button" class="btn btn-ink" id="f-apply">Show universities</button></div>
+</dialog>
 
 <script type="application/json" id="deb-data">__DEB_DATA__</script>
 <script>
@@ -690,36 +715,66 @@ function titleCase(s) {
 }
 const initials = n => n.replace(/\(.*?\)/g, "").split(/[\s.]+/).filter(w => /^[A-Za-z]/.test(w) && !SMALL.has(w.toLowerCase())).slice(0, 2).map(w => w[0].toUpperCase()).join("");
 const fmtDate = iso => { try { return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return iso; } };
-const ART = [["#e8586f", "#f3a0ad", "#c73a52"], ["#2f8f83", "#7cc7bb", "#1f6f65"], ["#4f62c9", "#98a6ec", "#3546a5"], ["#d9822b", "#f2bd7c", "#b5651a"],
-  ["#8a4fb8", "#c39be3", "#6c3794"], ["#3c7d4a", "#8cc39a", "#2a6137"], ["#c2526b", "#e8a3b3", "#9b3550"], ["#2b78a8", "#86bfe0", "#1d5b82"]];
-const artVars = u => { let h = 0; for (const c of u.k) h = (h * 31 + c.charCodeAt(0)) >>> 0; const a = ART[h % ART.length]; return `--a1:${a[0]};--a2:${a[1]};--a3:${a[2]}`; };
+
+/* ================= interface ================= */
+const fy = y => (y || "").replace("-", "–");                       // 2024-25 → 2024–25
+const sy = y => y ? `${y.slice(2, 4)}–${y.slice(5)}` : "";         // 2024-25 → 24–25
+const fyText = s => String(s || "").replace(/(\d{4})-(\d{2})\b/g, "$1–$2");
+const ico = (id, extra = "") => `<svg class="ico" ${extra}><use href="#i-${id}"/></svg>`;
 const progCount = u => new Set(u.online.map(r => r.p)).size;
 const sortedOn = u => [...u.onYears].sort();
+const typeShort = t => (t || "").replace(" University", "").replace("Deemed to be", "Deemed").replace("State Open", "State Open");
+const PG = new Set(["MBA", "MCA", "MCOM", "MA", "MSC", "MSW", "PGD", "MLIS", "ACHARYA", "MED", "MJMC"]);
 let saved = new Set();
 try { saved = new Set(JSON.parse(localStorage.getItem("dc-saved") || "[]")); } catch {}
-const persistSaved = () => { try { localStorage.setItem("dc-saved", JSON.stringify([...saved])); } catch {} };
+const persist = () => { try { localStorage.setItem("dc-saved", JSON.stringify([...saved])); } catch {} };
+function showDialog(d) { if (!d.open) { if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", ""); } }
+document.addEventListener("click", e => { const c = e.target.closest("[data-close]"); if (c) c.closest("dialog").close(); });
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d && d.id !== "d-uni") d.close(); }));
 
-$("#intro-sub").textContent = `Check any online programme from ${ONLINE_U.length} universities against UGC-DEB approvals for your admission year.`;
-$("#foot-src").innerHTML = `Source: <a href="${esc(D.source)}" target="_blank" rel="noopener">UGC-DEB list of ODL and Online programmes</a>, fetched ${esc(fmtDate(D.asOf))}.`;
+const ASOF = fmtDate(D.asOf);
+$("#stamp").textContent = `UGC-DEB data · ${ASOF}`;
+$("#browse-sub").textContent = `${ONLINE_U.length} universities on UGC-DEB's online list, ${fy(FIRST)} to ${fy(LAST)}.`;
+$("#foot-src").innerHTML = `Source: <a href="${esc(D.source)}" target="_blank" rel="noopener">UGC-DEB programme list</a>, fetched ${esc(ASOF)}.`;
+$("#faq-src").innerHTML = `From UGC-DEB's official programme list at <a href="${esc(D.source)}" target="_blank" rel="noopener">deb.ugc.ac.in</a>, last fetched ${esc(ASOF)}.`;
 
-/* ---------- search bar ---------- */
+/* ---------- seal ---------- */
+let sealN = 0;
+const SEAL = { ok: ["#E5F2EA", "#17663E"], warn: ["#FBF0DC", "#8A4B00"], bad: ["#FBE9E5", "#A52A1C"], na: ["#ECEBE6", "#4E535B"] };
+const GLYPH = {
+  ok: '<path d="M47.5 60.5l8.5 8.5 16.5-17.5" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+  bad: '<path d="M50 50l20 20M70 50L50 70" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>',
+  warn: '<path d="M60 46v17" fill="none" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round"/><circle cx="60" cy="74" r="3.4" fill="#FFFFFF"/>',
+  na: '<path d="M53.5 53a6.8 6.8 0 1 1 9.5 6.3c-2 .8-3 2.4-3 4.4v1" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="74" r="3.4" fill="#FFFFFF"/>',
+};
+function seal(kind, text, size = 120) {
+  const [soft, c] = SEAL[kind], id = `seal-${++sealN}`;
+  return `<svg class="seal" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="Seal: ${esc(text.replace(/[·\s]+$/, ""))}">
+    <defs><path id="${id}" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+    <circle cx="60" cy="60" r="58" fill="${soft}" stroke="${c}" stroke-width="1.5"/>
+    <circle cx="60" cy="60" r="38" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="2 3"/>
+    <circle cx="60" cy="60" r="31" fill="${c}"/>
+    <text font-family="JetBrains Mono, monospace" font-size="8.6" font-weight="600" letter-spacing="${text.length > 34 ? 1.6 : 2}" fill="${c}"><textPath href="#${id}">${esc(text)}</textPath></text>
+    ${GLYPH[kind]}</svg>`;
+}
+
+/* ---------- search box ---------- */
 const S = { uni: null, code: "", spec: "", year: "", passing: +LAST.slice(0, 4) + 1 };
-const sbar = $("#sbar"), uniIn = $("#q-uni");
+const uniIn = $("#q-uni");
 let openSeg = null, hl = -1, uniOpts = [];
-
 function setOpen(seg) {
   openSeg = seg;
-  sbar.classList.toggle("active", !!seg);
-  sbar.querySelectorAll(".seg").forEach(s => { const on = s.dataset.seg === seg; s.classList.toggle("on", on); s.setAttribute("aria-expanded", String(on)); });
+  document.querySelectorAll("#sbox .seg").forEach(s => { const on = s.dataset.seg === seg; s.classList.toggle("on", on); if (s.tagName === "BUTTON") s.setAttribute("aria-expanded", String(on)); });
   for (const id of ["uni", "prog", "year"]) $("#p-" + id).hidden = id !== seg;
   uniIn.setAttribute("aria-expanded", String(seg === "uni"));
-  if (seg === "uni") renderUniPanel();
-  if (seg === "prog") renderProgPanel();
-  if (seg === "year") renderYearPanel();
+  if (seg === "uni") renderUniPanel(); else if (seg === "prog") renderProgPanel(); else if (seg === "year") renderYearPanel();
 }
-sbar.querySelectorAll(".seg").forEach(s => s.addEventListener("click", () => { if (s.dataset.seg === "uni") { uniIn.focus(); setOpen("uni"); } else setOpen(openSeg === s.dataset.seg ? null : s.dataset.seg); }));
+document.querySelectorAll("#sbox .seg").forEach(s => s.addEventListener("click", () => {
+  if (s.dataset.seg === "uni") { setOpen("uni"); return; }
+  setOpen(openSeg === s.dataset.seg ? null : s.dataset.seg);
+}));
 uniIn.addEventListener("focus", () => setOpen("uni"));
-document.addEventListener("mousedown", e => { if (!e.target.closest("#sform")) setOpen(null); });
+document.addEventListener("mousedown", e => { if (openSeg && !e.target.closest("#sform")) setOpen(null); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && openSeg) setOpen(null); });
 
 function uniMatches(t) {
@@ -732,17 +787,14 @@ function uniMatches(t) {
     return [s, u];
   }).filter(x => x[0]).sort((a, b) => b[0] - a[0] || a[1].n.localeCompare(b[1].n)).slice(0, 8).map(x => x[1]);
 }
-function uniSubtitle(u) {
-  if (!u.online.length) return `<span class="m warn">Distance only · no online approval</span>`;
-  const ys = sortedOn(u);
-  return `<span class="m">${esc(u.s || "India")} · Online ${ys[0]} to ${ys.at(-1).slice(5)}</span>`;
-}
+const uniLine = u => u.online.length
+  ? `<small>${esc([u.s, u.t].filter(Boolean).join(" · "))} · ${progCount(u)} online programmes</small>`
+  : `<small class="warn">Distance only · no online approval</small>`;
 function renderUniPanel() {
   uniOpts = uniMatches(uniIn.value);
-  const title = uniIn.value.trim() ? "" : `<p class="p-title">Most online programmes</p>`;
-  $("#p-uni").innerHTML = title + (uniOpts.length ? uniOpts.map((u, i) =>
-    `<button type="button" class="opt${i === hl ? " hl" : ""}" role="option" id="uo-${i}" data-u="${u.i}"><span class="ibox">${icon("building")}</span><span><span class="n">${esc(u.n)}</span>${uniSubtitle(u)}</span></button>`).join("")
-    : `<p class="empty-note">No match in UGC's list. You can still run the check.</p>`);
+  $("#p-uni").innerHTML = (uniIn.value.trim() ? "" : `<p class="kicker" style="padding:8px 12px 4px">Most online programmes</p>`) +
+    (uniOpts.length ? uniOpts.map((u, i) => `<button type="button" class="opt${i === hl ? " hl" : ""}" role="option" id="uo-${i}" data-u="${u.i}"><span><b>${esc(u.n)}</b>${uniLine(u)}</span>${ico("chev")}</button>`).join("")
+      : `<p class="disclaim" style="padding:12px">No match in UGC's list. You can still run the check.</p>`);
   uniIn.setAttribute("aria-activedescendant", hl >= 0 ? `uo-${hl}` : "");
 }
 uniIn.addEventListener("input", () => { S.uni = null; hl = -1; if (openSeg !== "uni") setOpen("uni"); else renderUniPanel(); });
@@ -752,41 +804,35 @@ uniIn.addEventListener("keydown", e => {
   else if (e.key === "Enter" && hl >= 0 && uniOpts[hl]) { e.preventDefault(); pickUni(uniOpts[hl], true); }
 });
 $("#p-uni").addEventListener("click", e => { const b = e.target.closest("[data-u]"); if (b) pickUni(U[+b.dataset.u], true); });
-function pickUni(u, advance) {
-  S.uni = u; uniIn.value = u ? u.n : "";
-  if (u && S.code && !NON_ODL[S.code] && !u.rows.some(r => r.code === S.code)) { /* keep choice; check will explain */ }
-  $("#s-hint").hidden = true;
-  if (advance) setOpen("prog");
-}
+function pickUni(u, advance) { S.uni = u; uniIn.value = u ? u.n : ""; $("#s-hint").hidden = true; if (advance) setOpen("prog"); }
 
 function renderProgPanel() {
   const u = S.uni, have = u ? new Set(u.online.map(r => r.code)) : null;
   const codes = Object.keys(DEGREES).filter(c => onlineCodes.has(c));
-  const chip = c => {
-    const dim = have && !have.has(c);
-    return `<button type="button" class="chip-btn${dim ? " dim" : ""}" data-code="${c}" aria-pressed="${S.code === c}">${icon(DEGREES[c][3])}<span>${esc(DEGREES[c][0])}${dim ? "<small>Not offered online here</small>" : ""}</span></button>`;
-  };
   const sorted = have ? [...codes.filter(c => have.has(c)), ...codes.filter(c => !have.has(c))] : codes;
-  let html = `<div class="pgroup"><p class="p-sub">${u ? "Online degrees at " + esc(u.n) : "Degree"}</p><div class="chips">${sorted.map(chip).join("")}</div></div>`;
+  let html = `<div class="p-sec"><p class="p-head">${u ? "Online degrees at " + esc(u.n) : "Degree"}</p><div class="pills">${sorted.map(c => {
+    const dim = have && !have.has(c);
+    return `<button type="button" class="pill${dim ? " dim" : ""}" data-code="${c}" aria-pressed="${S.code === c}" ${dim ? `title="Not offered online at this university"` : ""}>${esc(DEGREES[c][0])}</button>`;
+  }).join("")}</div></div>`;
   if (DEGREES[S.code]) {
     const specs = new Map();
     for (const r of (u ? u.online : []).filter(r => r.code === S.code)) if (specTokens(r.spec).length) { const l = titleCase(r.spec); specs.set(l.toLowerCase(), [l, r.spec]); }
     const list = [...specs.values()].sort((a, b) => a[0].localeCompare(b[0]));
     const isOther = S.spec && !list.some(([, v]) => v === S.spec);
-    html += `<div class="pgroup"><p class="p-sub">Specialisation</p><div class="pills">
+    html += `<div class="p-sec"><p class="p-head">Specialisation</p><div class="pills">
       <button type="button" class="pill" data-spec="" aria-pressed="${!S.spec}">General / none</button>
       ${list.map(([l, v]) => `<button type="button" class="pill" data-spec="${esc(v)}" aria-pressed="${S.spec === v}">${esc(l.length > 44 ? l.slice(0, 42) + "…" : l)}</button>`).join("")}
-      <button type="button" class="pill" data-spec="__other" aria-pressed="${isOther}">Other</button></div>
-      <input class="other-in" id="spec-other" placeholder="Specialisation as printed, e.g. Finance" value="${isOther ? esc(S.spec) : ""}" ${isOther ? "" : "hidden"}></div>`;
+      <button type="button" class="pill" data-spec="__other" aria-pressed="${!!isOther}">Other</button></div>
+      <input class="text-in" id="spec-other" placeholder="Specialisation as printed, e.g. Finance" value="${isOther ? esc(S.spec) : ""}" ${isOther ? "" : "hidden"}></div>`;
   }
-  html += `<div class="pgroup"><p class="p-sub">Professional degrees</p><div class="pills">${Object.entries(NON_ODL).map(([c, n]) => `<button type="button" class="pill" data-code="${c}" aria-pressed="${S.code === c}">${esc(n)}</button>`).join("")}</div></div>`;
+  html += `<div class="p-sec"><p class="p-head">Professional degrees</p><div class="pills">${Object.entries(NON_ODL).map(([c, n]) => `<button type="button" class="pill" data-code="${c}" aria-pressed="${S.code === c}">${esc(n)}</button>`).join("")}</div></div>`;
   $("#p-prog").innerHTML = html;
 }
 $("#p-prog").addEventListener("click", e => {
   const c = e.target.closest("[data-code]"), sp = e.target.closest("[data-spec]");
   if (c) { S.code = c.dataset.code; S.spec = ""; updateVals(); if (NON_ODL[S.code]) setOpen("year"); else renderProgPanel(); }
   else if (sp) {
-    if (sp.dataset.spec === "__other") { renderProgPanel(); const i = $("#spec-other"); i.hidden = false; $("#p-prog").querySelectorAll("[data-spec]").forEach(b => b.setAttribute("aria-pressed", String(b === sp))); i.focus(); return; }
+    if (sp.dataset.spec === "__other") { $("#p-prog").querySelectorAll("[data-spec]").forEach(b => b.setAttribute("aria-pressed", String(b === sp))); const i = $("#spec-other"); i.hidden = false; i.focus(); return; }
     S.spec = sp.dataset.spec; updateVals(); setOpen("year");
   }
 });
@@ -794,262 +840,338 @@ $("#p-prog").addEventListener("input", e => { if (e.target.id === "spec-other") 
 $("#p-prog").addEventListener("keydown", e => { if (e.target.id === "spec-other" && e.key === "Enter") { e.preventDefault(); setOpen("year"); } });
 
 function renderYearPanel() {
-  $("#years").innerHTML = [...YEARS].reverse().map(y => `<button type="button" class="pill" data-y="${y}" aria-pressed="${S.year === y}">${y}</button>`).join("") +
-    PRE.slice().reverse().map(y => `<button type="button" class="pill pre" data-y="${y}" aria-pressed="${S.year === y}">${y}</button>`).join("");
-  $("#py").textContent = S.passing; pyNote(false);
+  $("#p-year").innerHTML = `<p class="p-head">Year of admission</p>
+    <div class="years-grid">${[...YEARS].reverse().map(y => `<button type="button" class="ybtn" data-y="${y}" aria-pressed="${S.year === y}">${fy(y)}</button>`).join("")}
+    ${PRE.slice().reverse().map(y => `<button type="button" class="ybtn pre" data-y="${y}" aria-pressed="${S.year === y}">${fy(y)}</button>`).join("")}</div>
+    <div class="p-sec"><div class="stepper"><span><b>Only know the passing year?</b><small>We'll work out admission from course length</small></span>
+      <span class="step"><button type="button" data-py="-1" aria-label="Earlier passing year">${ico("minus", 'style="width:14px;height:14px"')}</button><span id="py">${S.passing}</span><button type="button" data-py="1" aria-label="Later passing year">${ico("plus", 'style="width:14px;height:14px"')}</button></span></div>
+      <p class="step-note" id="py-note"></p></div>`;
+  pyNote(false);
 }
-$("#years").addEventListener("click", e => { const b = e.target.closest("[data-y]"); if (!b) return; S.year = b.dataset.y; updateVals(); setOpen(null); runFromBar(); });
-const pyStep = d => { S.passing += d; $("#py").textContent = S.passing; pyNote(true); };
-$("#py-minus").addEventListener("click", () => pyStep(-1));
-$("#py-plus").addEventListener("click", () => pyStep(1));
+$("#p-year").addEventListener("click", e => {
+  const y = e.target.closest("[data-y]"), p = e.target.closest("[data-py]");
+  if (y) { S.year = y.dataset.y; updateVals(); setOpen(null); runFromBar(); }
+  else if (p) { S.passing += +p.dataset.py; $("#py").textContent = S.passing; pyNote(true); }
+});
 function pyNote(apply) {
-  const d = DEGREES[S.code];
-  if (!d) { $("#py-note").textContent = "Choose a degree first so we know the course length."; return; }
+  const d = DEGREES[S.code], el = $("#py-note"); if (!el) return;
+  if (!d) { el.textContent = "Choose a degree first so we know the course length."; return; }
   const st = S.passing - d[2], ay = `${st}-${String(st + 1).slice(2)}`;
-  $("#py-note").innerHTML = `${esc(d[0])} takes ${d[2]} year${d[2] > 1 ? "s" : ""}: admission was likely <b>${ay}</b>.`;
-  if (apply) { S.year = ay; updateVals(); $("#years").querySelectorAll("[data-y]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.y === ay))); }
+  el.innerHTML = `${esc(d[0])} takes ${d[2]} year${d[2] > 1 ? "s" : ""}: admission was likely <b class="mono">${fy(ay)}</b>.`;
+  if (apply) { S.year = ay; updateVals(); $("#p-year").querySelectorAll("[data-y]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.y === ay))); }
 }
 function updateVals() {
   const vp = $("#v-prog"), vy = $("#v-year");
   vp.textContent = S.code ? degName(S.code) + (specTokens(S.spec).length ? " · " + titleCase(S.spec) : "") : "Add degree";
   vp.classList.toggle("set", !!S.code);
-  vy.textContent = S.year || "Add year"; vy.classList.toggle("set", !!S.year);
+  vy.textContent = S.year ? fy(S.year) : "Add year"; vy.classList.toggle("set", !!S.year); vy.classList.toggle("mono", !!S.year);
 }
-function hint(msg, seg) { const h = $("#s-hint"); h.textContent = msg; h.hidden = false; if (seg === "uni") uniIn.focus(); setOpen(seg); }
+function hint(msg, seg) { const h = $("#s-hint"); h.textContent = msg; h.hidden = false; setOpen(seg); if (seg === "uni") uniIn.focus(); }
 function runFromBar() {
   const q = { uni: S.uni, uniText: uniIn.value.trim(), code: S.code, spec: NON_ODL[S.code] ? "" : S.spec, year: S.year };
   if (!q.uniText && !NON_ODL[q.code]) return hint("Enter the university name from the certificate.", "uni");
   if (!q.code) return hint("Choose the degree.", "prog");
   if (!q.year) return hint("Choose the year of admission.", "year");
-  $("#s-hint").hidden = true; setOpen(null); render(q, false);
+  $("#s-hint").hidden = true; setOpen(null); openResult(q);
 }
 $("#sform").addEventListener("submit", e => { e.preventDefault(); runFromBar(); });
 
-/* ---------- result ---------- */
-const STATUS = { ok: ["Approved", "check"], warn: ["Needs review", "alert"], bad: ["Not approved", "x"], na: ["Can't determine", "help"] };
-let lastText = "", lastQ = null;
-function render(q, isExample) {
-  const r = check(q); lastQ = { ...q, uni: r.uni || null };
-  const el = $("#result"), u = r.uni;
-  el.className = `result-area tone-${r.tone}`;
-  el.hidden = false;
-  const progLabel = NON_ODL[q.code] || `${degName(q.code)}${specTokens(q.spec).length ? " · " + titleCase(q.spec) : ""}`;
-  const facts = [
-    ["building", u ? u.n : (q.uniText || "Not given"), u ? [u.s, u.t].filter(Boolean).join(" · ") + (r.autoMatched ? ` · matched from "${q.uniText}"` : "") : "University"],
-    ["cap", progLabel, NON_ODL[q.code] ? "Professional degree" : DEGREES[q.code][1]],
-    ["cal", q.year, "Year of admission"],
-    ["online", "Online", "Mode of study"],
-  ];
-  lastText = [`DegreeCheck: ${STATUS[r.tone][0].toUpperCase()}`, r.headline, r.detail, ...facts.map(f => `${f[2]}: ${f[1]}`),
-    r.records.length ? "UGC-DEB entries: " + r.records.map(x => `${x.name} (${x.mode === "ONLINE" ? "Online" : "Distance"}, ${x.y})`).join("; ") : "",
-    `Source: ${D.source} (as of ${fmtDate(D.asOf)})`].filter(Boolean).join("\n");
+/* ---------- popular checks ---------- */
+const POP = [["Chandigarh University", "MBA", "2024-25"], ["Amity University", "MCA", "2025-26"], ["Lovely Professional University", "BCA", "2023-24"]]
+  .map(([n, code, y]) => { const u = byKey.get(uniKey(n)); if (!u) return null;
+    const yr = u.online.some(r => r.code === code && r.y === y) ? y : (u.online.filter(r => r.code === code).map(r => r.y).sort().at(-1));
+    return yr ? { u, code, y: yr } : null; }).filter(Boolean);
+$("#popular").innerHTML = POP.map((p, i) => `<button type="button" class="pop" data-pop="${i}"><b>${esc(p.u.n)}</b><span>${esc(degName(p.code))}</span><span class="mono" style="font-size:12.5px">${sy(p.y)}</span><span class="arrow">${ico("arrow", 'style="width:14px;height:14px;stroke-width:2.2"')}</span></button>`).join("");
+$("#popular").addEventListener("click", e => {
+  const b = e.target.closest("[data-pop]"); if (!b) return;
+  const p = POP[+b.dataset.pop]; pickUni(p.u, false); S.code = p.code; S.spec = ""; S.year = p.y; updateVals(); runFromBar();
+});
+if (!POP.length) $(".popular").hidden = true;
 
-  const ev = r.records[0];
-  el.innerHTML = `
-    <article class="rcard">
-      <div class="rc-band">
-        <span class="status"><span class="dot">${icon(STATUS[r.tone][1])}</span>${STATUS[r.tone][0]}</span>
-        <h2 class="rc-title">${esc(r.headline)}</h2>
-        <p class="rc-detail">${esc(r.detail)}</p>
-        ${r.autoMatched ? `<p class="rc-note">Matched "${esc(q.uniText)}" to ${esc(u.n)}.</p>` : ""}
+/* ---------- result dialog ---------- */
+const dR = $("#d-result");
+const LABEL = { ok: "Approved", warn: "Needs review", bad: "Not approved", na: "Check the name" };
+let R = null;   // { q, r, pick }
+function sealText(r, q) {
+  const y = YEARS.includes(q.year) || ALL_YEARS.includes(q.year) ? fy(q.year) : "";
+  if (r.reason === "NOT_FOUND") return "NOT ON THE UGC-DEB LIST · · · ";
+  if (r.reason === "CONFIRM_UNIVERSITY") return "CHECK THE UNIVERSITY NAME · · ";
+  if (r.reason === "NOT_OFFERED_ONLINE") return "NOT OFFERED ONLINE · UGC-DEB · ";
+  if (r.tone === "ok") return `UGC-DEB · APPROVED ONLINE · ${y} ·`;
+  if (r.tone === "warn") return `UGC-DEB · NEEDS REVIEW · ${y} · `;
+  return `NOT APPROVED ONLINE · ${y} · `;
+}
+function openResult(q, pick = false) { R = { q, pick }; renderResult(); showDialog(dR); dR.scrollTop = 0; }
+function renderResult() {
+  const { q, pick } = R, hasYear = !!q.year;
+  const r = hasYear ? check(q) : null;
+  R.r = r;
+  const u = (r && r.uni) || q.uni;
+  const sealKind = r ? (["NOT_FOUND", "CONFIRM_UNIVERSITY"].includes(r.reason) ? "na" : r.tone) : null;
+  const deg = DEGREES[q.code];
+  const prog = NON_ODL[q.code] || `${degName(q.code)}${specTokens(q.spec).length ? " · " + titleCase(q.spec) : ""}`;
+  const showStrip = u && deg && (!r || r.history);
+  const hist = new Set(((r && r.history) || (u ? u.online.filter(x => x.code === q.code && (!specTokens(q.spec).length || specMatches(q.spec, x.spec))) : [])).map(x => x.y));
+  const ev = r && r.records[0];
+  const shareLabel = `${ico("share", 'style="width:16px;height:16px;stroke-width:1.9"')}<span class="share-t">Share result</span>`;
+
+  dR.className = r ? `tone-${r.tone}` : "";
+  dR.innerHTML = `
+    <div class="d-bar">
+      <span class="kicker">${pick ? "Check your degree" : "Your result"}</span>
+      <div class="acts">
+        ${pick ? "" : `<button type="button" class="again" id="r-again">${ico("search")}<span>Check another<span class="t-long"> degree</span></span></button>`}
+        <button type="button" class="xbtn" data-close aria-label="Close">${ico("x", 'style="stroke-width:2.2"')}</button>
       </div>
-      ${r.cands ? `<div class="rc-band"><h3 class="rc-label">Did you mean</h3><div class="cands">${r.cands.map(c =>
-        `<button type="button" class="opt" data-cand="${c.i}"><span class="ibox">${icon("building")}</span><span><span class="n">${esc(c.n)}</span>${uniSubtitle(c)}</span></button>`).join("")}</div></div>` : ""}
-      ${r.history && u ? `<div class="rc-band">
-        <div class="rc-row"><h3 class="rc-label">Online approval by admission year</h3>
-          <div class="cal-key"><span><i class="k-on"></i>Approved</span><span><i class="k-gap"></i>No data</span></div></div>
-        ${calendar(r, q)}
-        ${ev ? `<p class="evidence">${icon("doc")}<span>UGC-DEB entry: <b>${esc(titleCase(ev.name))}</b> · ${ev.mode === "ONLINE" ? "Online" : "Distance"} · ${ev.y}${r.records.length > 1 ? ` · +${r.records.length - 1} more` : ""} · <a href="${esc(D.source)}" target="_blank" rel="noopener">Source</a></span></p>` : ""}
-        ${r.tone !== "ok" && r.odlYears && r.odlYears.length ? `<p class="evidence">${icon("book")}<span>Distance (ODL) approvals for this programme: ${esc(yearRange(r.odlYears))}</span></p>` : ""}
-      </div>` : ""}
-      <div class="rc-band rc-foot">
-        ${r.next ? `<p class="rc-next">${esc(r.next)}</p>` : ""}
-        <div class="actions">
-          <button type="button" class="btn-dark" id="ask">Ask an advisor</button>
-          <button type="button" class="linkbtn" id="copy">Copy result</button>
-          <span class="copied" id="copied" hidden>Copied</span>
+    </div>
+    ${pick ? `<div class="ctx"><span class="box">${ico("cap")}</span><div><b>${esc(prog)} · ${esc(u.n)}</b><span>Online · ${esc([u.t, u.s].filter(Boolean).join(", "))}</span></div></div>` : ""}
+    ${!r ? `<div class="ask-year"><h2 id="r-title">When were you admitted?</h2><p>Pick your admission year to see if your degree is approved. Approval follows the year you joined, not the year you passed.</p></div>` : `
+    <div class="r-head">
+      ${seal(sealKind, sealText(r, q), 120)}
+      <div class="txt">
+        <span class="status">${LABEL[r.tone]}</span>
+        <h2 id="r-title">${esc(fyText(r.headline))}</h2>
+        <p>${esc(fyText(r.detail))}</p>
+        ${r.autoMatched ? `<p class="note">Matched "${esc(q.uniText)}" to ${esc(u.n)}.</p>` : ""}
+      </div>
+    </div>`}
+    ${r && r.cands ? `<div class="cands"><h3>Did you mean</h3>${r.cands.map(c => `<button type="button" class="cand" data-cand="${c.i}"><span><b>${esc(c.n)}</b><small>${esc([c.s, c.t].filter(Boolean).join(" · "))}${c.online.length ? ` · ${progCount(c)} online programmes` : " · distance only"}</small></span>${ico("chev")}</button>`).join("")}</div>` : ""}
+    ${r && !pick && !r.cands && r.reason !== "NOT_FOUND" ? `<dl class="facts">
+      <div><dt class="lbl">University</dt><dd>${esc(u ? u.n : q.uniText)}</dd>${u ? `<dd class="sub">${esc([u.s, u.t].filter(Boolean).join(" · "))}</dd>` : ""}</div>
+      <div><dt class="lbl">Programme</dt><dd>${esc(prog)}</dd></div>
+      <div><dt class="lbl">Admitted</dt><dd class="mono">${esc(fy(q.year))}</dd></div>
+      <div><dt class="lbl">Mode</dt><dd>Online</dd></div>
+    </dl>` : ""}
+    ${showStrip ? `<div class="strip-sec">
+      <div class="row-between"><h3>${r ? "Online approval by admission year" : "Your admission year"}</h3>
+        <div class="key"><span><i class="k-on"></i>Approved online</span>${r ? `<span><i class="k-you"></i>Your year</span>` : ""}</div></div>
+      <ol class="strip" style="--n:${ALL_YEARS.length}" ${pick ? 'role="group" aria-label="Admission year"' : ""}>${ALL_YEARS.map(y => {
+        const on = hist.has(y), you = y === q.year;
+        const cls = `cell ${on ? "on" : "off"}${you ? " you" : ""}`, sub = you ? "Your year" : on ? "Online" : "Not online";
+        return `<li>${pick ? `<button type="button" class="${cls}" data-pick="${y}" aria-pressed="${you}" aria-label="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></button>`
+          : `<span class="${cls}" ${you ? 'aria-current="true"' : ""} title="${fy(y)}: ${on ? "approved online" : "not approved online"}"><b>${sy(y)}</b><small>${sub}</small></span>`}</li>`;
+      }).join("")}</ol>
+      ${!r ? `<p class="disclaim">Tap your year. Green years were approved online; you can switch years any time.</p>` : ""}
+      ${ev ? `<p class="evidence">${ico("doc")}<span>UGC-DEB entry: <b>${esc(titleCase(ev.name))}</b> · ${ev.mode === "ONLINE" ? "Online" : "Distance"} · ${fy(ev.y)} · <a href="${esc(D.source)}" target="_blank" rel="noopener">Source</a></span></p>` : ""}
+      ${r && r.tone !== "ok" && r.odlYears && r.odlYears.length ? `<p class="evidence">${ico("bank")}<span>Distance (ODL) approvals for this programme: ${esc(yearRange(r.odlYears))}</span></p>` : ""}
+    </div>` : ""}
+    ${r ? `<div class="r-foot">
+      <div class="row">
+        <p>${r.tone === "ok" && deg ? `Want to compare this ${esc(degName(q.code))} with other approved online ${esc(degName(q.code))}s?` : r.next ? `<b>What to do next:</b> ${esc(fyText(r.next))}` : ""}</p>
+        <div class="btns">
+          <button type="button" class="btn btn-ink" id="r-ask">Talk to an advisor</button>
+          ${r.cands || r.reason === "NOT_FOUND" ? "" : `<button type="button" class="btn btn-line" id="r-share" aria-label="Share result">${shareLabel}</button>`}
+          <span class="copied" id="r-copied" hidden>Copied</span>
         </div>
       </div>
-    </article>
-    <p class="fineprint">UGC-DEB data as of ${esc(fmtDate(D.asOf))}. This confirms programme approval, not that a specific certificate is genuine.</p>`;
-  $("#try").hidden = true;
-  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
-  el.querySelectorAll("[data-cand]").forEach(b => b.addEventListener("click", () => { pickUni(U[+b.dataset.cand], false); runFromBar(); }));
-  $("#copy").addEventListener("click", copyResult);
-  $("#ask").addEventListener("click", () => prefillLead(lastQ));
-  if (!isExample) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-}
-function calendar(r, q) {
-  const on = new Set(r.history.map(x => x.y)), listed = r.uni.years;
-  const cells = YEARS.map(y => {
-    const st = on.has(y) ? "on" : listed.has(y) ? "off" : "gap";
-    return `<div class="day ${st}${y === q.year ? " q" : ""}" title="${y}: ${st === "on" ? "approved online" : st === "off" ? "not approved online" : "university not in that year's list"}"><span class="c">${y.slice(2, 4)}–${y.slice(5)}</span></div>`;
-  }).join("");
-  return `<div class="cal-scroll"><div class="cal" style="--n:${YEARS.length}">${cells}</div></div>`;
+      <a class="verify" href="${esc(D.source)}" target="_blank" rel="noopener">${ico("bank", 'style="width:20px;height:20px"')}<span class="t"><b>Verify on the official UGC-DEB list</b><small>deb.ugc.ac.in · data as of ${esc(ASOF)}</small></span>${ico("ext", 'style="width:16px;height:16px"')}</a>
+      ${r.tone === "ok" ? `<p class="disclaim">This confirms programme approval, not that a specific certificate is genuine. Check DigiLocker or the university for that.</p>` : ""}
+    </div>` : ""}`;
 }
 function yearRange(ys) {
   const idx = ys.map(y => ALL_YEARS.indexOf(y)).sort((a, b) => a - b);
   const contiguous = idx.every((v, i) => !i || v === idx[i - 1] + 1);
-  return contiguous && ys.length > 2 ? `${ALL_YEARS[idx[0]]} to ${ALL_YEARS[idx.at(-1)]}` : idx.map(i => ALL_YEARS[i]).join(", ");
+  return contiguous && ys.length > 2 ? `${fy(ALL_YEARS[idx[0]])} to ${fy(ALL_YEARS[idx.at(-1)])}` : idx.map(i => fy(ALL_YEARS[i])).join(", ");
 }
-async function copyResult() {
-  try { await navigator.clipboard.writeText(lastText); }
-  catch { const ta = document.createElement("textarea"); ta.value = lastText; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch {} ta.remove(); }
-  const c = $("#copied"); c.hidden = false; setTimeout(() => { c.hidden = true; }, 1800);
+dR.addEventListener("click", e => {
+  const t = e.target;
+  if (t.closest("#r-again")) { dR.close(); $("#top").scrollIntoView({ behavior: "smooth" }); setOpen("uni"); uniIn.focus({ preventScroll: true }); }
+  else if (t.closest("#r-ask")) { dR.close(); if (dU.open) dU.close(); prefillLead(R.r && R.r.uni ? R.r.uni : R.q.uni, R.q.code); }
+  else if (t.closest("#r-share")) shareResult();
+  else if (t.closest("[data-pick]")) { R.q = { ...R.q, year: t.closest("[data-pick]").dataset.pick }; renderResult(); }
+  else if (t.closest("[data-cand]")) { const u = U[+t.closest("[data-cand]").dataset.cand]; pickUni(u, false); R.q = { ...R.q, uni: u, uniText: u.n }; renderResult(); }
+});
+async function shareResult() {
+  const { q, r } = R;
+  const text = [`DegreeCheck: ${LABEL[r.tone]}`, fyText(r.headline), fyText(r.detail), `Source: ${D.source} (data as of ${ASOF})`].join("\n");
+  try { if (navigator.share) { await navigator.share({ title: "DegreeCheck result", text }); return; } } catch (err) { if (err && err.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(text); }
+  catch { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch {} ta.remove(); }
+  const c = $("#r-copied"); if (c) { c.hidden = false; setTimeout(() => { c.hidden = true; }, 1800); }
 }
 
 /* ---------- lead form ---------- */
 const courseSel = $("#l-course");
-courseSel.innerHTML = `<option value="">Select</option>` + Object.keys(DEGREES).filter(c => onlineCodes.has(c)).map(c => `<option value="${c}">${esc(DEGREES[c][0])}</option>`).join("") + `<option value="NOT_SURE">Not sure yet</option>`;
-let leadAbout = null;
-function prefillLead(q) {
-  leadAbout = q && q.uni ? { uni: q.uni.n, prog: degName(q.code) } : null;
-  if (q && DEGREES[q.code]) courseSel.value = q.code;
+courseSel.innerHTML = `<option value="">Select a course</option>` + Object.keys(DEGREES).filter(c => onlineCodes.has(c)).map(c => `<option value="${c}">${esc(DEGREES[c][0])}</option>`).join("") + `<option value="NOT_SURE">Not sure yet</option>`;
+let leadUni = null;
+function prefillLead(u, code) {
+  leadUni = u || null;
+  if (code && DEGREES[code]) courseSel.value = code;
   const a = $("#lead-about");
-  if (leadAbout) { a.hidden = false; a.innerHTML = `<span>About <b>${esc(leadAbout.uni)}</b> · ${esc(leadAbout.prog)}</span><button type="button" aria-label="Remove">${icon("x", 'style="width:14px;height:14px"')}</button>`; }
+  a.hidden = !u; if (u) a.innerHTML = `About <b>${esc(u.n)}</b>${code && DEGREES[code] ? " · " + esc(degName(code)) : ""}`;
+  if ($("#lead-form").hidden) { $("#lead-form").hidden = false; $("#lead-done").hidden = true; }
   $("#lead").scrollIntoView({ behavior: "smooth", block: "center" });
-  setTimeout(() => $("#l-name").focus({ preventScroll: true }), 400);
+  setTimeout(() => $("#l-name").focus({ preventScroll: true }), 450);
 }
-$("#lead-about").addEventListener("click", e => { if (e.target.closest("button")) { leadAbout = null; $("#lead-about").hidden = true; } });
+$("#faq-lead").addEventListener("click", e => { e.preventDefault(); prefillLead(null); });
 $("#l-phone").addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10); });
 $("#lead-form").addEventListener("submit", e => {
   e.preventDefault();
-  const name = $("#l-name").value.trim(), phone = $("#l-phone").value.trim();
-  const errs = [];
-  const mark = (id, bad) => $(id).classList.toggle("bad", bad);
-  mark("#fc-name", name.length < 2); if (name.length < 2) errs.push("your name");
-  mark("#fc-phone", !/^[6-9]\d{9}$/.test(phone)); if (!/^[6-9]\d{9}$/.test(phone)) errs.push("a 10-digit mobile number");
-  mark("#fc-course", !courseSel.value); if (!courseSel.value) errs.push("the course");
-  const consent = $("#l-consent").checked; $("#consent-wrap").classList.toggle("bad", !consent);
+  const name = $("#l-name").value.trim(), phone = $("#l-phone").value.trim(), course = courseSel.value, consent = $("#l-consent").checked;
+  const bad = { name: name.length < 2, phone: !/^[6-9]\d{9}$/.test(phone), course: !course };
+  $("#f-name").classList.toggle("bad", bad.name); $("#f-phone").classList.toggle("bad", bad.phone); $("#f-course").classList.toggle("bad", bad.course);
+  $("#consent").classList.toggle("bad", !consent);
+  const missing = [bad.name && "your name", bad.phone && "a 10-digit mobile number", bad.course && "a course"].filter(Boolean);
   const err = $("#lead-err");
-  if (errs.length || !consent) {
-    err.hidden = false;
-    err.textContent = errs.length ? `Please add ${errs.join(", ")}.` + (consent ? "" : " Tick the box so we can call you.") : "Tick the box so we can call you.";
-    return;
-  }
-  err.hidden = true;
-  $("#lead-form").hidden = true;
+  if (missing.length || !consent) { err.hidden = false; err.textContent = (missing.length ? `Please add ${missing.join(", ")}. ` : "") + (consent ? "" : "Tick the box so we can call you."); return; }
+  err.hidden = true; $("#lead-form").hidden = true;
   const d = $("#lead-done"); d.hidden = false;
-  d.innerHTML = `<span class="tick">${icon("check")}</span><h2 style="font-size:22px">Thanks, ${esc(name.split(" ")[0])}</h2>
-    <p class="sub">A counsellor will call <b>+91 ${esc(phone.slice(0, 5))} ${esc(phone.slice(5))}</b> within 24 hours${leadAbout ? ` about ${esc(leadAbout.uni)}` : ""}.</p>
+  d.innerHTML = `<span class="tick">${ico("check")}</span><h2>Thanks, ${esc(name.split(" ")[0])}</h2>
+    <p>A counsellor will call <b>+91 ${esc(phone.slice(0, 5))} ${esc(phone.slice(5))}</b> within 24 hours${leadUni ? ` about ${esc(leadUni.n)}` : ""}.</p>
     <p class="proto">Prototype: this form isn't connected to a CRM yet, so nothing was sent.</p>
-    <button type="button" class="linkbtn" id="lead-reset">Submit another enquiry</button>`;
-  $("#lead-reset").addEventListener("click", () => { $("#lead-form").reset(); $("#lead-form").hidden = false; d.hidden = true; });
+    <button type="button" class="linkbtn" id="lead-again">Submit another enquiry</button>`;
+  $("#lead-again").addEventListener("click", () => { $("#lead-form").reset(); $("#lead-about").hidden = true; leadUni = null; $("#lead-form").hidden = false; d.hidden = true; });
 });
 
 /* ---------- browse ---------- */
-const B = { code: "", q: "", year: "", types: new Set(), state: "", saved: false, shown: 16 };
-const CATS = [["", "All", "grid"], ...["MBA", "MCA", "BBA", "BCA", "MCOM", "BCOM", "MA", "BA"].filter(c => onlineCodes.has(c)).map(c => [c, DEGREES[c][0], DEGREES[c][3]])];
-$("#cats").innerHTML = CATS.map(([c, l, ic]) => `<button type="button" class="cat" data-c="${c}" aria-pressed="${c === B.code}">${icon(ic)}${esc(l)}</button>`).join("");
-$("#cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; B.code = b.dataset.c; B.shown = 16; $("#cats").querySelectorAll(".cat").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGrid(); });
-$("#b-more").addEventListener("click", () => { B.shown += 16; renderGrid(); });
-
-function filtered() {
-  const q = squash(B.q), words = fold(B.q).toLowerCase().split(/\s+/).filter(Boolean);
-  return ONLINE_U.filter(u =>
-    (!B.code || u.online.some(r => r.code === B.code && (!B.year || r.y === B.year))) &&
-    (!B.year || u.onYears.has(B.year)) && (!B.state || u.s === B.state) && (!B.types.size || B.types.has(u.t)) &&
-    (!B.saved || saved.has(u.k)) &&
-    (!q || acr.get(q) === u || words.every(w => u.n.toLowerCase().includes(w)) || u.k.includes(q)));
+const B = { code: "", unis: new Set(), year: "", types: new Set(), state: "", saved: false, shown: 8 };
+const DEG_ROW = ["MBA", "MCA", "BBA", "BCA", "BCOM", "MCOM", "MA", "BA", "MSC", "PGD"].filter(c => onlineCodes.has(c));
+function renderDegRow() {
+  $("#deg-row").innerHTML = [`<button type="button" class="pill" data-c="" aria-pressed="${!B.code}">All degrees</button>`,
+    ...DEG_ROW.map(c => `<button type="button" class="pill" data-c="${c}" aria-pressed="${B.code === c}">${esc(DEGREES[c][0])}</button>`)].join("");
 }
-function topDegrees(u) {
+$("#deg-row").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; B.code = b.dataset.c; B.shown = 8; renderDegRow(); renderGrid(); });
+const matchesFilters = (u, f) =>
+  (!f.code || u.online.some(r => r.code === f.code && (!f.year || r.y === f.year))) &&
+  (!f.year || u.onYears.has(f.year)) && (!f.state || u.s === f.state) && (!f.types.size || f.types.has(u.t)) &&
+  (!f.saved || saved.has(u.k)) && (!f.unis.size || f.unis.has(u.i));
+function topCodes(u) {
   const c = {}; for (const r of u.online) c[r.code] = (c[r.code] || 0) + 1;
-  const list = Object.keys(c).sort((a, b) => c[b] - c[a]).map(degName);
-  return list.slice(0, 3).join(", ") + (list.length > 3 ? ` +${list.length - 3}` : "");
+  return Object.keys(c).sort((a, b) => c[b] - c[a]);
 }
 function renderGrid() {
-  const list = filtered().sort((a, b) => b.onYears.has(LAST) - a.onYears.has(LAST) || progCount(b) - progCount(a));
-  $("#b-count").textContent = `${list.length} online universit${list.length === 1 ? "y" : "ies"}${B.code ? " offering " + degName(B.code) : ""}`;
+  const list = ONLINE_U.filter(u => matchesFilters(u, B)).sort((a, b) => b.onYears.has(LAST) - a.onYears.has(LAST) || progCount(b) - progCount(a));
   $("#grid").innerHTML = list.slice(0, B.shown).map(u => {
-    const ys = sortedOn(u), current = u.onYears.has(LAST);
-    return `<div class="card" role="button" tabindex="0" data-open="${u.i}" aria-label="${esc(u.n)} details">
-      <div class="art" style="${artVars(u)}"><span class="badge">${current ? "Approved for " + LAST : "Last approved " + ys.at(-1)}</span>
-        <button type="button" class="heart" data-heart="${esc(u.k)}" aria-pressed="${saved.has(u.k)}" aria-label="Save ${esc(u.n)}">${icon("heart")}</button>
-        <span class="ini" aria-hidden="true">${esc(initials(u.n))}</span></div>
-      <div class="t"><span>${esc(u.n)}</span></div>
-      <div class="meta"><span>${esc(u.s || "India")} · ${progCount(u)} online programmes</span><span><b>${esc(topDegrees(u))}</b></span></div>
-    </div>`;
-  }).join("") || `<p class="b-count">No university matches. Try clearing filters.</p>`;
-  $("#more-row").hidden = list.length <= B.shown;
-  const n = (B.code && !CATS.some(c => c[0] === B.code) ? 1 : 0) + (B.year ? 1 : 0) + B.types.size + (B.state ? 1 : 0) + (B.saved ? 1 : 0);
+    const ys = sortedOn(u), codes = topCodes(u), cur = u.onYears.has(LAST);
+    return `<article class="ucard">
+      <div class="ucard-body">
+        <div class="ucard-top"><span class="kicker">${esc([typeShort(u.t), u.s].filter(Boolean).join(" · ") || "India")}</span>
+          <button type="button" class="save" data-save="${esc(u.k)}" aria-pressed="${saved.has(u.k)}" aria-label="Save ${esc(u.n)}">${ico("save")}</button></div>
+        <h3>${esc(u.n)}</h3>
+        <div class="chips">${codes.slice(0, 4).map(c => `<span>${esc(degName(c))}</span>`).join("")}${codes.length > 4 ? `<span class="more">+${codes.length - 4}</span>` : ""}</div>
+      </div>
+      <div class="ucard-meta"><span>${progCount(u)} programmes</span><span class="range${cur ? "" : " old"}">${sy(ys[0])} → ${sy(ys.at(-1))}</span></div>
+      <button type="button" class="ucard-link" data-open="${u.i}">View all programmes${ico("arrow", 'style="stroke-width:2.2"')}</button>
+    </article>`;
+  }).join("") || `<p class="empty">No university matches these filters. <button type="button" class="linkbtn" id="clear-inline">Clear filters</button></p>`;
+  $("#showing").textContent = `Showing ${Math.min(B.shown, list.length)} of ${list.length}`;
+  $("#b-more").hidden = list.length <= B.shown;
+  $("#more-row").hidden = !list.length;
+  const n = B.unis.size + (B.year ? 1 : 0) + B.types.size + (B.state ? 1 : 0) + (B.saved ? 1 : 0) + (B.code && !DEG_ROW.includes(B.code) ? 1 : 0);
   $("#f-count").hidden = !n; $("#f-count").textContent = n;
 }
+$("#b-more").addEventListener("click", () => { B.shown += 12; renderGrid(); });
 $("#grid").addEventListener("click", e => {
-  const h = e.target.closest("[data-heart]");
-  if (h) { e.stopPropagation(); const k = h.dataset.heart; saved.has(k) ? saved.delete(k) : saved.add(k); persistSaved(); h.setAttribute("aria-pressed", String(saved.has(k))); if (B.saved) renderGrid(); return; }
-  const c = e.target.closest("[data-open]"); if (c) openUni(U[+c.dataset.open]);
+  const s = e.target.closest("[data-save]");
+  if (s) { toggleSave(s.dataset.save); s.setAttribute("aria-pressed", String(saved.has(s.dataset.save))); if (B.saved) renderGrid(); return; }
+  const o = e.target.closest("[data-open]"); if (o) openUni(U[+o.dataset.open]);
+  if (e.target.closest("#clear-inline")) { Object.assign(B, { code: "", unis: new Set(), year: "", types: new Set(), state: "", saved: false }); renderDegRow(); renderGrid(); }
 });
-$("#grid").addEventListener("keydown", e => { const c = e.target.closest("[data-open]"); if (c && (e.key === "Enter" || e.key === " ") && e.target === c) { e.preventDefault(); openUni(U[+c.dataset.open]); } });
+function toggleSave(k) { saved.has(k) ? saved.delete(k) : saved.add(k); persist(); }
 
-/* filters dialog */
-const dF = $("#d-filters"), F = { code: "", year: "", types: new Set(), state: "", saved: false };
+/* ---------- filters dialog ---------- */
+const dF = $("#d-filters"), F = { code: "", unis: new Set(), year: "", types: new Set(), state: "", saved: false };
 const TYPES = ["Private University", "Deemed to be University", "State University", "Central University", "State Open University"].filter(t => ONLINE_U.some(u => u.t === t));
 $("#f-state").insertAdjacentHTML("beforeend", [...new Set(ONLINE_U.map(u => u.s).filter(Boolean))].sort().map(s => `<option>${esc(s)}</option>`).join(""));
 function renderFilters() {
+  $("#f-tags").innerHTML = [...F.unis].map(i => `<span class="tag">${esc(U[i].n)}<button type="button" data-untag="${i}" aria-label="Remove ${esc(U[i].n)}">${ico("x")}</button></span>`).join("");
   $("#f-degs").innerHTML = [`<button type="button" class="pill" data-fd="" aria-pressed="${!F.code}">Any</button>`, ...Object.keys(DEGREES).filter(c => onlineCodes.has(c)).map(c => `<button type="button" class="pill" data-fd="${c}" aria-pressed="${F.code === c}">${esc(DEGREES[c][0])}</button>`)].join("");
-  $("#f-years").innerHTML = [`<button type="button" class="pill" data-fy="" aria-pressed="${!F.year}">Any year</button>`, ...[...YEARS].reverse().map(y => `<button type="button" class="pill" data-fy="${y}" aria-pressed="${F.year === y}">${y}</button>`)].join("");
+  $("#f-years").innerHTML = YEARS.map(y => `<button type="button" class="ybtn" data-fy="${y}" aria-pressed="${F.year === y}">${sy(y)}</button>`).join("");
   $("#f-types").innerHTML = TYPES.map(t => `<button type="button" class="pill" data-ft="${t}" aria-pressed="${F.types.has(t)}">${t}</button>`).join("");
-  $("#f-state").value = F.state; $("#f-saved").setAttribute("aria-pressed", String(F.saved));
-  const n = ONLINE_U.filter(u => (!F.code || u.online.some(r => r.code === F.code)) && (!F.year || u.onYears.has(F.year)) && (!F.state || u.s === F.state) && (!F.types.size || F.types.has(u.t)) && (!F.saved || saved.has(u.k))).length;
+  $("#f-state").value = F.state; $("#f-saved").checked = F.saved;
+  const n = ONLINE_U.filter(u => matchesFilters(u, F)).length;
   $("#f-apply").textContent = `Show ${n} universit${n === 1 ? "y" : "ies"}`;
 }
-$("#open-filters").addEventListener("click", () => { F.code = B.code; F.year = B.year; F.types = new Set(B.types); F.state = B.state; F.saved = B.saved; renderFilters(); dF.showModal(); });
+function renderSugg() {
+  const t = $("#f-uni").value.trim(), box = $("#f-sugg");
+  if (!t) { box.hidden = true; return; }
+  const m = uniMatches(t).filter(u => u.online.length && !F.unis.has(u.i)).slice(0, 6);
+  box.hidden = false;
+  box.innerHTML = m.length ? m.map(u => `<button type="button" class="opt" data-tag="${u.i}"><span><b>${esc(u.n)}</b>${uniLine(u)}</span>${ico("plus", 'style="width:16px;height:16px"')}</button>`).join("") : `<p class="disclaim" style="padding:10px">No online university matches.</p>`;
+}
+$("#f-uni").addEventListener("input", renderSugg);
+$("#open-filters").addEventListener("click", () => { Object.assign(F, { code: B.code, unis: new Set(B.unis), year: B.year, types: new Set(B.types), state: B.state, saved: B.saved }); $("#f-uni").value = ""; $("#f-sugg").hidden = true; renderFilters(); showDialog(dF); });
 dF.addEventListener("click", e => {
-  const y = e.target.closest("[data-fy]"), t = e.target.closest("[data-ft]"), dg = e.target.closest("[data-fd]");
-  if (dg) { F.code = dg.dataset.fd; renderFilters(); }
-  else if (y) { F.year = y.dataset.fy; renderFilters(); }
-  else if (t) { F.types.has(t.dataset.ft) ? F.types.delete(t.dataset.ft) : F.types.add(t.dataset.ft); renderFilters(); }
-  else if (e.target.closest("#f-saved")) { F.saved = !F.saved; renderFilters(); }
-  else if (e.target === dF) dF.close();
+  const t = e.target, g = (sel) => t.closest(sel);
+  if (g("[data-tag]")) { F.unis.add(+g("[data-tag]").dataset.tag); $("#f-uni").value = ""; $("#f-sugg").hidden = true; renderFilters(); }
+  else if (g("[data-untag]")) { F.unis.delete(+g("[data-untag]").dataset.untag); renderFilters(); }
+  else if (g("[data-fd]")) { F.code = g("[data-fd]").dataset.fd; renderFilters(); }
+  else if (g("[data-fy]")) { const y = g("[data-fy]").dataset.fy; F.year = F.year === y ? "" : y; renderFilters(); }
+  else if (g("[data-ft]")) { const v = g("[data-ft]").dataset.ft; F.types.has(v) ? F.types.delete(v) : F.types.add(v); renderFilters(); }
 });
 $("#f-state").addEventListener("change", e => { F.state = e.target.value; renderFilters(); });
-$("#f-clear").addEventListener("click", () => { F.code = ""; F.year = ""; F.types.clear(); F.state = ""; F.saved = false; renderFilters(); });
-$("#f-apply").addEventListener("click", () => { $("#cats").querySelectorAll(".cat").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.c === F.code))); Object.assign(B, { code: F.code, year: F.year, types: new Set(F.types), state: F.state, saved: F.saved, shown: 16 }); dF.close(); renderGrid(); });
-document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
+$("#f-saved").addEventListener("change", e => { F.saved = e.target.checked; renderFilters(); });
+$("#f-clear").addEventListener("click", () => { Object.assign(F, { code: "", unis: new Set(), year: "", types: new Set(), state: "", saved: false }); renderFilters(); });
+$("#f-apply").addEventListener("click", () => { Object.assign(B, { code: F.code, unis: new Set(F.unis), year: F.year, types: new Set(F.types), state: F.state, saved: F.saved, shown: 8 }); dF.close(); renderDegRow(); renderGrid(); $("#browse").scrollIntoView({ behavior: "smooth" }); });
 
-/* university dialog */
+/* ---------- university page ---------- */
 const dU = $("#d-uni");
+let curUni = null;
+function uniProgrammes(u) {
+  const by = new Map();
+  for (const r of u.online) {
+    const key = r.code + "|" + specTokens(r.spec).join(" ");
+    if (!by.has(key)) by.set(key, { code: r.code, spec: r.spec, names: new Map(), ys: new Set() });
+    const g = by.get(key); g.ys.add(r.y); g.names.set(r.name, (g.names.get(r.name) || 0) + 1);
+  }
+  return [...by.values()].map(g => {
+    const full = titleCase([...g.names.entries()].sort((a, b) => b[1] - a[1])[0][0]);
+    const short = degName(g.code) + (specTokens(g.spec).length ? " " + titleCase(g.spec) : "");
+    const last = [...g.ys].sort().at(-1);
+    return { ...g, full, short: short.length > 60 ? short.slice(0, 58) + "…" : short, last };
+  });
+}
 function openUni(u) {
-  const ys = sortedOn(u);
-  const byProg = new Map();
-  for (const r of u.online) { if (!byProg.has(r.p)) byProg.set(r.p, { r, ys: new Set() }); byProg.get(r.p).ys.add(r.y); }
-  const groups = new Map();
-  for (const v of byProg.values()) { if (!groups.has(v.r.code)) groups.set(v.r.code, []); groups.get(v.r.code).push(v); }
-  const order = Object.keys(DEGREES);
-  $("#du-body").innerHTML = `
-    <div class="art d-hero" style="${artVars(u)}"><span class="ini" aria-hidden="true">${esc(initials(u.n))}</span></div>
-    <div class="d-sec"><div><h2 class="d-name">${esc(u.n)}</h2><p class="d-meta">${esc([u.t, u.s].filter(Boolean).join(" · "))}</p></div>
-      <div class="facts">
-        <div class="fact">${icon("online")}<p><b>Online since ${ys[0]}</b><span>Listed for ${ys.length} of ${YEARS.length} online years</span></p></div>
-        <div class="fact">${icon("cap")}<p><b>${progCount(u)} online programmes</b><span>${esc(topDegrees(u))}</span></p></div>
-      </div></div>
-    <div class="d-sec"><h3>Approved online programmes</h3>
-      <p class="odl-note">Circles show admission years ${YEARS[0]} to ${LAST}. Struck-through years weren't approved.</p>
-      ${[...groups.entries()].sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])).map(([code, items]) => `<p class="pg-title">${esc(DEGREES[code] ? DEGREES[code][1] : code)}</p>` +
-        items.sort((a, b) => a.r.name.localeCompare(b.r.name)).map(({ r, ys }) => `<div class="prow"><span class="pn">${esc(titleCase(r.name))}</span>
-          <span class="mini" aria-label="Approved years">${YEARS.map(y => `<span class="${ys.has(y) ? "on" : ""}" title="${y}">${y.slice(2, 4)}</span>`).join("")}</span>
-          <button type="button" data-p="${r.p}" data-y="${[...ys].sort().at(-1)}">Check</button></div>`).join("")).join("")}
-    </div>`;
-  dU.dataset.u = u.i;
-  dU.showModal(); dU.scrollTop = 0;
+  curUni = u;
+  const ys = sortedOn(u), progs = uniProgrammes(u);
+  const groups = [["Postgraduate", progs.filter(p => PG.has(p.code))], ["Undergraduate", progs.filter(p => !PG.has(p.code))]].filter(g => g[1].length);
+  const ycols = `<div class="ycols" style="--n:${ALL_YEARS.length}">${ALL_YEARS.map(y => `<span>${sy(y)}</span>`).join("")}</div>`;
+  dU.innerHTML = `
+    <header class="top"><div class="wrap">
+      <button type="button" class="brand" data-close style="border:0;background:none;cursor:pointer;padding:0" aria-label="Back to DegreeCheck home">
+        <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 4.5 7.3v7.9c0 7.2 4.9 12.9 11.5 14.3 6.6-1.4 11.5-7.1 11.5-14.3V7.3L16 2.5Z" fill="#2B3BD1"/><path d="m10.8 16 3.6 3.6 7-7.3" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>degreecheck</span></button>
+      <span class="stamp">UGC-DEB data · ${esc(ASOF)}</span>
+    </div></header>
+    <section class="u-hero ruled"><div class="wrap">
+      <button type="button" class="back" data-close>${ico("back", 'style="width:16px;height:16px;stroke-width:2.2"')}All universities</button>
+      <div class="u-row">
+        <div class="u-title">
+          <span class="kicker" style="font-size:12px">${esc([u.t, u.s].filter(Boolean).join(" · "))}</span>
+          <h1>${esc(u.n)}</h1>
+          <div class="u-stats"><span><b>${progs.length}</b> programmes approved online</span><span>Online since <b class="mono">${fy(ys[0])}</b></span><span>Latest approval <b class="mono">${fy(ys.at(-1))}</b></span></div>
+        </div>
+        <div class="u-acts">
+          <button type="button" class="btn btn-blue" id="u-check">${ico("search", 'style="stroke-width:2.6"')}Check a degree from here</button>
+          <button type="button" class="btn btn-line" id="u-save" aria-pressed="${saved.has(u.k)}">${ico("save", 'style="stroke-width:1.8"')}${saved.has(u.k) ? "Saved" : "Save"}</button>
+        </div>
+      </div>
+    </div></section>
+    <section class="u-progs"><div class="wrap">
+      <div class="row-between"><h2>Online programmes</h2><div class="key"><span><i class="k-on"></i>Approved online</span></div></div>
+      ${groups.map(([title, rows]) => `<div>
+        <div class="pgrid pg-head"><h3>${title}</h3>${ycols}<span></span><span></span></div>
+        ${rows.sort((a, b) => (b.last === LAST) - (a.last === LAST) || a.short.localeCompare(b.short)).map((p, i) => `<div class="pgrid prow">
+          <div class="nm"><b>${esc(p.short)}</b><small>${esc(p.full)}</small></div>
+          <ol class="ycols" style="--n:${ALL_YEARS.length};list-style:none;margin:0;padding:0" aria-label="${esc(p.short)}: ${ALL_YEARS.map(y => fy(y) + (p.ys.has(y) ? " approved online" : " not approved online")).join(", ")}">${ALL_YEARS.map(y => `<li class="c ${p.ys.has(y) ? "on" : "off"}" title="${fy(y)}: ${p.ys.has(y) ? "approved online" : "not approved online"}"></li>`).join("")}</ol>
+          <span class="badge ${p.last === LAST ? "cur" : "old"}">${p.last === LAST ? "Online · " + sy(LAST) : "Online till " + sy(p.last)}</span>
+          <button type="button" class="chk" data-prog="${esc(p.code)}" data-spec="${esc(p.spec)}" aria-label="Check if ${esc(p.short)} was approved for your admission year">${ico("search")}Check my admission year</button>
+        </div>`).join("")}
+      </div>`).join("")}
+      <p class="u-note">Programme names are tidied from UGC-DEB's list; entries spelled differently in different years are merged. Source: <a href="${esc(D.source)}" target="_blank" rel="noopener">UGC-DEB programme list</a>, fetched ${esc(ASOF)}.</p>
+    </div></section>`;
+  showDialog(dU); dU.scrollTop = 0;
 }
 dU.addEventListener("click", e => {
-  if (e.target === dU) return dU.close();
-  const b = e.target.closest("[data-p]"); if (!b) return;
-  const u = U[+dU.dataset.u], [, code, spec] = P[+b.dataset.p];
-  dU.close();
-  pickUni(u, false); S.code = code; S.spec = spec; S.year = b.dataset.y; updateVals(); runFromBar();
+  const t = e.target;
+  const c = t.closest("[data-prog]");
+  if (c) { openResult({ uni: curUni, uniText: curUni.n, code: c.dataset.prog, spec: c.dataset.spec, year: "" }, true); return; }
+  if (t.closest("#u-save")) { toggleSave(curUni.k); const b = $("#u-save"); b.setAttribute("aria-pressed", String(saved.has(curUni.k))); b.lastChild.textContent = saved.has(curUni.k) ? "Saved" : "Save"; renderGrid(); }
+  if (t.closest("#u-check")) { dU.close(); pickUni(curUni, false); S.code = ""; S.spec = ""; S.year = ""; updateVals(); $("#top").scrollIntoView({ behavior: "smooth" }); setOpen("prog"); }
 });
 
-/* ---------- one example ---------- */
-const EX = ["Amity University", "Lovely Professional University", "Manipal University"].map(n => byKey.get(uniKey(n)))
-  .find(u => u && u.online.some(r => r.code === "MBA" && r.y === LAST));
-if (EX) {
-  $("#try-btn").textContent = `${EX.n}, online MBA, ${LAST}`; $("#try").hidden = false;
-  $("#try-btn").addEventListener("click", () => { pickUni(EX, false); S.code = "MBA"; S.spec = ""; S.year = LAST; updateVals(); runFromBar(); });
-}
-
 /* ---------- boot ---------- */
+renderDegRow();
 renderGrid();
 })();
 </script>
