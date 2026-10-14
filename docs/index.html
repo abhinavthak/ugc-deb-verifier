@@ -312,6 +312,7 @@ button.cell:hover { filter: brightness(1.08); }
 .ycols .c { height: 28px; border-radius: 6px; }
 .ycols .c.on { background: var(--ok); }
 .ycols .c.off { border: 1px dashed #D6D2C7; }
+.ycols .c span { display: none; }
 .badge { justify-self: start; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
 .badge.cur { background: var(--ok-soft); color: var(--ok); }
 .badge.old { background: var(--warn-soft); color: var(--warn); }
@@ -325,7 +326,7 @@ button.cell:hover { filter: brightness(1.08); }
 #d-filters[open] { display: flex; }
 #d-filters .d-bar { display: grid; grid-template-columns: 44px 1fr 44px; padding: 0 12px; height: 64px; flex: none; position: static; }
 #d-filters .d-bar h2 { text-align: center; font-size: 16px; font-weight: 700; }
-.f-body { flex: 1; overflow: auto; padding: 4px 28px 24px; display: flex; flex-direction: column; }
+.f-body { flex: 1; min-height: 0; overflow: auto; padding: 4px 28px 24px; display: flex; flex-direction: column; }
 .f-sec { padding: 22px 0; display: flex; flex-direction: column; gap: 14px; position: relative; }
 .f-sec + .f-sec { border-top: 1px solid var(--line-soft); }
 .f-sec h3 { font-family: var(--display); font-weight: 700; font-size: 20px; }
@@ -358,7 +359,10 @@ button.cell:hover { filter: brightness(1.08); }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pgrid { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; }
   .pg-head .ycols { display: none; }
-  .prow .ycols { grid-column: 1 / -1; order: 3; }
+  .prow .ycols { grid-column: 1 / -1; order: 3; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+  .ycols .c { height: 30px; display: grid; place-items: center; }
+  .ycols .c span { display: inline; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--muted); }
+  .ycols .c.on span { color: #fff; }
   .prow .badge { justify-self: end; }
   .prow .chk { grid-column: 1 / -1; order: 4; }
 }
@@ -390,7 +394,7 @@ button.cell:hover { filter: brightness(1.08); }
   .r-foot .btns .btn-line { width: 50px; padding: 0; min-height: 50px; }
   .d-bar { padding-left: 16px; }
   .again .t-long { display: none; }
-  #d-filters { width: 100vw; max-width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; }
+  #d-filters { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border-radius: 0; }
   .f-body, .f-foot { padding-inline: 16px; }
   .f-years { grid-template-columns: repeat(3, 1fr); }
 }
@@ -1162,7 +1166,7 @@ function openUni(u) {
         <div class="pgrid pg-head"><h3>${title}</h3>${ycols}<span></span><span></span></div>
         ${rows.sort((a, b) => (b.last === LAST) - (a.last === LAST) || a.short.localeCompare(b.short)).map((p, i) => `<div class="pgrid prow">
           <div class="nm"><b>${esc(p.short)}</b><small>${esc(p.full)}</small></div>
-          <ol class="ycols" style="--n:${ALL_YEARS.length};list-style:none;margin:0;padding:0" aria-label="${esc(p.short)}: ${ALL_YEARS.map(y => fy(y) + (p.ys.has(y) ? " approved online" : " not approved online")).join(", ")}">${ALL_YEARS.map(y => `<li class="c ${p.ys.has(y) ? "on" : "off"}" title="${fy(y)}: ${p.ys.has(y) ? "approved online" : "not approved online"}"></li>`).join("")}</ol>
+          <ol class="ycols" style="--n:${ALL_YEARS.length};list-style:none;margin:0;padding:0" aria-label="${esc(p.short)}: ${ALL_YEARS.map(y => fy(y) + (p.ys.has(y) ? " approved online" : " not approved online")).join(", ")}">${ALL_YEARS.map(y => `<li class="c ${p.ys.has(y) ? "on" : "off"}" title="${fy(y)}: ${p.ys.has(y) ? "approved online" : "not approved online"}"><span aria-hidden="true">${sy(y)}</span></li>`).join("")}</ol>
           <span class="badge ${p.last === LAST ? "cur" : "old"}">${p.last === LAST ? "Online · " + sy(LAST) : "Online till " + sy(p.last)}</span>
           <button type="button" class="chk" data-prog="${esc(p.code)}" data-spec="${esc(p.spec)}" aria-label="Check if ${esc(p.short)} was approved for your admission year">${ico("search")}Check my admission year</button>
         </div>`).join("")}
